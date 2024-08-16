@@ -1,0 +1,22 @@
+docker:
+  network: daedalus
+api:
+  image:
+    repo: mrcide
+    name: daedalus-api
+    tag: latest
+  port: 8001
+db:
+  image:
+    repo: ghcr.io/jameel-institute
+    name: daedalus-web-app-db
+    # TODO: update to main when merged
+    tag: jidea-59-dockerise-web-app
+  port: 5432
+web_app:
+  image:
+    repo: ghcr/jameel-institute
+    name: daedalus-web-app
+    # TODO: update to main when merged
+    tag: jidea-59-dockerise-web-app
+  port: 3000
