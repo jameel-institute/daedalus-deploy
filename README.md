@@ -30,6 +30,6 @@ The configuration usage information is stored in `config/.last_deploy.`
 
 ## Deployment configurations
 There are three configurations
-- noproxy: for local testing
+- fakeproxy: for local testing
 - staging: for deployment onto our staging server at `daedalus.dev.dide.ic.ac.uk`
 - prod: tbd!

@@ -1,18 +1,29 @@
 docker:
   network: daedalus
+  prefix: daedalus
+proxy:
+  image:
+    repo: ghcr.io/jameel-institute
+    name: daedalus-proxy
+    # TODO: update to main when merged
+    tag: jidea-60
+  host: localhost
+  port_http: 80
+  port_https: 443
 api:
   image:
     repo: mrcide
     name: daedalus-api
     tag: latest
   port: 8001
-db:
+web_app_db:
   image:
     repo: ghcr.io/jameel-institute
     name: daedalus-web-app-db
     # TODO: update to main when merged
     tag: jidea-59-dockerise-web-app
   port: 5432
+  data_location: /pgdata
 web_app:
   image:
     repo: ghcr/jameel-institute

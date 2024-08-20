@@ -1,10 +1,8 @@
 proxy:
-  image:
-    repo: ghcr.io/jameel-institute
-    name: daedalus-proxy
-    # TODO: update to main when merged
-    tag: jidea-50
-  host: beebop-dev.dide.ic.ac.uk
   ssl:
     certificate: VAULT:secret/daedalus/ssl/staging:cert
-    key: VAULT:secret/beebop/daedalus/ssl/staging:key
+    key: VAULT:secret/daedalus/daedalus/ssl/staging:key
+vault:
+  addr: https://vault.dide.ic.ac.uk:8200
+  auth:
+    method: github
