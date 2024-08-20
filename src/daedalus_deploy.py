@@ -35,7 +35,8 @@ class DaedalusConfig:
         }
 
         self.volumes = {
-            "daedalus-data": "daedalus-data"
+            "daedalus-data": "daedalus-data",
+            "proxy-logs": "proxy-logs"
         }
 
         # api
@@ -55,10 +56,10 @@ class DaedalusConfig:
         # proxy
         self.proxy_ref = get_image_reference("proxy", dat)
         self.proxy_host = config.config_string(dat, ["proxy", "host"])
-        self.proxy_port_http = config.config_integer(dat,
-                                                     ["proxy", "port_http"])
-        self.proxy_port_https = config.config_integer(dat,
-                                                      ["proxy", "port_https"])
+        self.proxy_port_http = config.config_integer(dat, ["proxy", "port_http"])
+        self.proxy_port_https = config.config_integer(dat, ["proxy", "port_https"])
+        self.proxy_logs_location = config.config_string(dat, ["proxy", "logs_location"])
+
         if "ssl" in dat["proxy"]:
             self.proxy_ssl_certificate = config.config_string(dat,
                                                               ["proxy",
@@ -80,10 +81,9 @@ def daedalus_constellation(cfg):
     # 2. web_app_db
     # TODO: non-default db credentials
     web_app_db_mounts = [constellation.ConstellationMount("daedalus-data", cfg.web_app_db_data_location)]
-    # TODO: include volume in db docker file
-    #web_app_db_env = {"PGDATA", cfg.web_app_db_data_location}
     web_app_db = constellation.ConstellationContainer(
-        "web-app-db", cfg.web_app_db_ref, mounts=web_app_db_mounts)
+        "web-app-db", cfg.web_app_db_ref, configure=db_configure,
+        mounts=web_app_db_mounts)
 
     # 3. web_app
     web_app_env = {
@@ -94,9 +94,11 @@ def daedalus_constellation(cfg):
 
     # 4. proxy
     proxy_ports = [cfg.proxy_port_http, cfg.proxy_port_https]
+    proxy_mounts = [constellation.ConstellationMount("proxy-logs", cfg.proxy_logs_location)]
     daedalus_app_url = "http://{}-{}:{}".format(cfg.container_prefix, web_app.name, cfg.web_app_port)
     proxy = constellation.ConstellationContainer(
             "proxy", cfg.proxy_ref, ports=proxy_ports, configure=proxy_configure,
+            mounts=proxy_mounts,
             args=[cfg.proxy_host, cfg.proxy_ref.name, daedalus_app_url])
 
     containers = [api, web_app_db, web_app, proxy]
@@ -110,6 +112,11 @@ def daedalus_constellation(cfg):
 
 def daedalus_start(obj, args):
     obj.start(**args)
+
+def db_configure(container, cfg):
+    print("[web-app-dn] Waiting for db")
+    args = ["wait-for-db"]
+    docker_util.exec_safely(container, args)
 
 def proxy_configure(container, cfg):
     print("[proxy] Configuring proxy")

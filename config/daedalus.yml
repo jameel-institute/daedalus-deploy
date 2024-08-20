@@ -9,6 +9,7 @@ proxy:
     tag: jidea-60
   port_http: 80
   port_https: 443
+  logs_location: /var/log/nginx
 api:
   image:
     repo: mrcide
