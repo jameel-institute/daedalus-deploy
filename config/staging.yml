@@ -1,7 +1,10 @@
 proxy:
   ssl:
-    certificate: VAULT:secret/daedalus/ssl/staging:cert
-    key: VAULT:secret/daedalus/daedalus/ssl/staging:key
+    certificate: VAULT:secret/daedalus/ssl/dev:cert
+    key: VAULT:secret/daedalus/ssl/dev:key
+web_app_db:
+  postgres_user: VAULT:secret/daedalus/postgres/dev:user
+  postgres_password: VAULT:secret/daedalus/postgres/dev:password
 vault:
   addr: https://vault.dide.ic.ac.uk:8200
   auth:

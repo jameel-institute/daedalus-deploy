@@ -2,7 +2,7 @@
 Deploy tool for the Daedalus app
 
 ## Installation
-Installation requires a suitable virtual environment to be created:
+You should create a suitable virtual environment for installing the tool:
 ```
 python3 -m venv daedalus-venv
 ```

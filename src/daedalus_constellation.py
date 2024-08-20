@@ -15,8 +15,13 @@ class DaedalusConstellation:
             mounts=web_app_db_mounts)
 
         # 3. web_app
+        db_user = cfg.web_app_db_postgres_user
+        db_password = cfg.web_app_db_postgres_password
+        db_url = "postgresql://{}:{}@daedalus-web-app-db:{}/daedalus-web-app".format(db_user, db_password, cfg.web_app_db_port)
         web_app_env = {
-            "DATABASE_URL": "postgresql://daedalus-web-app-user:changeme@daedalus-web-app-db:{}/daedalus-web-app".format(cfg.web_app_db_port),
+            "POSTGRES_USER": db_user,
+            "POSTGRES_PASSWORD": db_password,
+            "DATABASE_URL": db_url,
             "NUXT_R_API_BASE": "http://daedalus-api:{}/".format(cfg.api_port)
         }
         web_app = constellation.ConstellationContainer("web-app", cfg.web_app_ref, environment=web_app_env)

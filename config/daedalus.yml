@@ -24,6 +24,7 @@ web_app_db:
     tag: jidea-59-dockerise-web-app
   port: 5432
   data_location: /pgdata
+  postgres_user: daedalus-web-app-user
 web_app:
   image:
     repo: ghcr.io/jameel-institute

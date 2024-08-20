@@ -37,6 +37,8 @@ class DaedalusConfig:
         self.web_app_db_ref = self.get_image_reference("web_app_db", dat)
         self.web_app_db_port = config.config_integer(dat, ["web_app_db", "port"])
         self.web_app_db_data_location = config.config_string(dat, ["web_app_db", "data_location"])
+        self.web_app_db_postgres_user = config.config_string(dat, ["web_app_db", "postgres_user"])
+        self.web_app_db_postgres_password = config.config_string(dat, ["web_app_db", "postgres_password"])
 
         # web_app
         self.web_app_ref = self.get_image_reference("web_app", dat)
