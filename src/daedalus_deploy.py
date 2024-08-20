@@ -79,6 +79,7 @@ def daedalus_constellation(cfg):
     # 2. web_app_db
     # TODO: non-default db credentials
     web_app_db_mounts = [constellation.ConstellationMount("daedalus_data", cfg.web_app_db_data_location)]
+    # TODO: include volume in db docker file
     web_app_db_env = {"PGDATA", cfg.web_app_db_data_location}
     web_app_db = constellation.ConstellationContainer(
         "web_app_db", cfg.web_app_db_ref, environment=web_app_db_env, mounts=web_app_db_mounts)
@@ -119,5 +120,5 @@ def proxy_configure(container, cfg):
     else:
         print("Generating self-signed certificates for proxy")
         args = ["/usr/local/bin/build-self-signed-certificate", "/run/proxy",
-                "GB", "London", "IC", "bacpop", cfg.proxy_host]
+                "GB", "London", "IC", "jameel-institute", cfg.proxy_host]
         docker_util.exec_safely(container, args)
