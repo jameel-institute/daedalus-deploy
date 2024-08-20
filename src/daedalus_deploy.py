@@ -14,7 +14,7 @@ def get_image_reference(config_section, dat):
         dat, [config_section, "image", "name"])
     tag = config.config_string(
         dat, [config_section, "image", "tag"])
-    return self.proxy_ref = constellation.ImageReference(repo, name, tag)
+    return constellation.ImageReference(repo, name, tag)
 
 class DaedalusConfig:
     def __init__(self, path, config_name=None, options=None):
@@ -29,30 +29,31 @@ class DaedalusConfig:
         # TODO: do we need this??
         self.containers = {
             "api": "api",
-            "web_app_db": "web_app_db",
-            "web_app": "web_app",
+            "web-app-db": "web-app-db",
+            "web-app": "web-app",
             "proxy": "proxy"
         }
 
         self.volumes = {
-            "daedalus_data": "daedalus_data"
+            "daedalus-data": "daedalus-data"
         }
 
         # api
-        self.api_ref = get_image_reference("api")
-        self.api_port = config.config_string(dat, ["proxy", "port"])
+        self.api_ref = get_image_reference("api", dat)
+        self.api_port = config.config_integer(dat, ["api", "port"])
 
         # web_app_db
-        self.web_app_db_ref = get_image_reference("web_app_db")
-        self.web_app_db_port = config.config_string(dat, ["web_app_db", "port"])
+        self.web_app_db_ref = get_image_reference("web_app_db", dat)
+        self.web_app_db_port = config.config_integer(dat, ["web_app_db", "port"])
         self.web_app_db_data_location = config.config_string(dat, ["web_app_db", "data_location"])
 
         # web_app
-        self.web_app_ref = get_image_reference("web_app")
-        self.web_app_port = config.config_string(dat, ["web_app", "port"])
+        self.web_app_ref = get_image_reference("web_app", dat)
+        self.web_app_port = config.config_integer(dat, ["web_app", "port"])
+        # TODO: use web_app port in the proxy nginx
 
         # proxy
-        self.proxy_ref = get_image_reference("proxy")
+        self.proxy_ref = get_image_reference("proxy", dat)
         self.proxy_host = config.config_string(dat, ["proxy", "host"])
         self.proxy_port_http = config.config_integer(dat,
                                                      ["proxy", "port_http"])
@@ -78,24 +79,25 @@ def daedalus_constellation(cfg):
 
     # 2. web_app_db
     # TODO: non-default db credentials
-    web_app_db_mounts = [constellation.ConstellationMount("daedalus_data", cfg.web_app_db_data_location)]
+    web_app_db_mounts = [constellation.ConstellationMount("daedalus-data", cfg.web_app_db_data_location)]
     # TODO: include volume in db docker file
-    web_app_db_env = {"PGDATA", cfg.web_app_db_data_location}
+    #web_app_db_env = {"PGDATA", cfg.web_app_db_data_location}
     web_app_db = constellation.ConstellationContainer(
-        "web_app_db", cfg.web_app_db_ref, environment=web_app_db_env, mounts=web_app_db_mounts)
+        "web-app-db", cfg.web_app_db_ref, mounts=web_app_db_mounts)
 
     # 3. web_app
     web_app_env = {
         "DATABASE_URL": "postgresql://daedalus-web-app-user:changeme@daedalus-web-app-db:{}/daedalus-web-app".format(cfg.web_app_db_port),
         "NUXT_R_API_BASE": "http://daedalus-api:{}/".format(cfg.api_port)
     }
-    web_app = constellation.ConstellationContainer("web_app", cfg.web_app_ref, environment=web_app_env)
+    web_app = constellation.ConstellationContainer("web-app", cfg.web_app_ref, environment=web_app_env)
 
     # 4. proxy
     proxy_ports = [cfg.proxy_port_http, cfg.proxy_port_https]
+    daedalus_app_url = "http://{}-{}:{}".format(cfg.container_prefix, web_app.name, cfg.web_app_port)
     proxy = constellation.ConstellationContainer(
             "proxy", cfg.proxy_ref, ports=proxy_ports, configure=proxy_configure,
-            args=[cfg.proxy_host, web_app.name])
+            args=[cfg.proxy_host, cfg.proxy_ref.name, daedalus_app_url])
 
     containers = [api, web_app_db, web_app, proxy]
 

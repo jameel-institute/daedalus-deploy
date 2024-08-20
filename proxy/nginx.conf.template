@@ -71,10 +71,13 @@ http {
         ssl_dhparam /run/proxy/dhparam.pem;
 
         root /usr/share/nginx/html;
+
+        location / {
+            proxy_pass ${DAEDALUS_APP}/;
+        }
     }
 
     # Redirect all http requests to the SSL endpoint and the correct domain name
-    # TODO: we may want to optionally support http temporarily
     server {
         listen 80 default_server;
         listen [::]:80 default_server;

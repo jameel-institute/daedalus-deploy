@@ -2,9 +2,19 @@
 Deploy tool for the Daedalus app
 
 ## Installation
-Clone this repo and install dependencies with:
+Installation requires a suitable virtual environment to be created:
 ```
-pip3 install --user -r requirements.txt
+python3 -m venv daedalus-venv
+```
+...and activated:
+```
+source daedalus-venv/bin/activate
+```
+(You can deactivate the venv later if required with `deactivate`.)
+
+With the venv activated, clone this repo and install dependencies with:
+```
+pip3 install -r requirements.txt./d
 ```
 
 ## Usage

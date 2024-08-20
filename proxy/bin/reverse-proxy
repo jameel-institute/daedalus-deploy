@@ -1,19 +1,20 @@
 #!/usr/bin/env bash
 set -eu
 
-if [ "$#" -eq 2 ]; then
+if [ "$#" -eq 3 ]; then
     export HTTP_HOST=$1
     export SERVER_NAME=$2
+    export DAEDALUS_APP=$3
 else
-    echo "Usage: <hostname> <servername>"
-    echo "e.g. docker run ... mrcide/daedalus-proxy:main localhost daedalus_proxy"
+    echo "Usage: <hostname> <servername> <daedalusapp>"
+    echo "e.g. docker run ... mrcide/daedalus-proxy:main localhost daedalus-proxy http://daedalus-web-app:3000"
     exit 1
 fi
 
 echo "We will listen on ports 80 (http) and 443 (https)"
-echo "with hostname $HTTP_HOST and servername $SERVER_NAME"
+echo "with hostname $HTTP_HOST and servername $SERVER_NAME and daedalus endpoint $DAEDALUS_APP"
 
-envsubst '$HTTP_HOST,$SERVER_NAME' \
+envsubst '$HTTP_HOST,$SERVER_NAME,$DAEDALUS_APP' \
          < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf
 
 # These paths must match the paths as used in the nginx.conf

@@ -4,7 +4,6 @@ FROM nginx:stable
 RUN rm /etc/nginx/conf.d/default.conf
 RUN rm /usr/share/nginx/html -rf
 
-# TODO: include these in constellation config
 VOLUME /var/log/nginx
 # location for certs
 VOLUME /run/proxy
