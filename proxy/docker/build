@@ -7,3 +7,4 @@ HERE=$(dirname $0)
 docker build \
    --tag $TAG_SHA \
    -f proxy/Dockerfile \
+   .
