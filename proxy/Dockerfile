@@ -1,9 +1,7 @@
 FROM nginx:stable
 
-# Clear out existing configuration
-# TODO: need this?
+# Clear out default configuration
 RUN rm /etc/nginx/conf.d/default.conf
-RUN rm /usr/share/nginx/html -rf
 
 VOLUME /var/log/nginx
 

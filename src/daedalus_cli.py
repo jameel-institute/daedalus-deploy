@@ -20,10 +20,8 @@ import pickle
 import time
 import timeago
 
-from src.daedalus_deploy import \
-    DaedalusConfig, \
-    daedalus_constellation, \
-    daedalus_start
+from src.daedalus_config import DaedalusConfig
+from src.daedalus_constellation import DaedalusConstellation
 
 
 def parse(argv=None):
@@ -99,13 +97,13 @@ def remove_config(path):
 def main(argv=None):
     path, config_name, action, args, options = parse(argv)
     config_name, cfg = load_config(path, config_name, options)
-    obj = daedalus_constellation(cfg)
+    constellation = DaedalusConstellation(cfg)
     if action == "upgrade":
-        obj.restart(pull_images=True)
+        constellation.obj.restart(pull_images=True)
     elif action == "start":
         save_config(path, config_name, cfg)
-        daedalus_start(obj, args)
+        constellation.start(args)
     else:
-        obj.__getattribute__(action)(**args)
+        constellation.obj.__getattribute__(action)(**args)
         if action == "stop" and args["remove_volumes"]:
             remove_config(path)

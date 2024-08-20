@@ -10,14 +10,11 @@ if [ "$#" -eq 6 ]; then
     COMMON="$6"
 else
     echo "Usage:"
-    echo "  self-signed-certificate DEST"
     echo "  self-signed-certificate DEST COUNTRY LOCATION ORG ORG_UNIT COMMON"
     exit 1
 fi
 
 SUBJ="/C=$COUNTRY/L=$LOCATION/O=$ORG/OU=$ORG_UNIT/CN=$COMMON"
-
-# TODO: exit if self-signed cert already exists
 
 mkdir -p $DEST
 openssl req -x509 \
