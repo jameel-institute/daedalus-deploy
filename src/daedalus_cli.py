@@ -83,6 +83,8 @@ def load_config(path, config_name=None, options=None):
         print("[Loaded configuration '{}' ({})]".format(
             config_name or "<base>", when))
     else:
+        if (config_name is None):
+            raise Exception("Config name must be provided when there is no previous deploy config,")
         cfg = DaedalusConfig(path, config_name, options=options)
     return config_name, cfg
 
@@ -98,6 +100,13 @@ def main(argv=None):
     path, config_name, action, args, options = parse(argv)
     config_name, cfg = load_config(path, config_name, options)
     constellation = DaedalusConstellation(cfg)
+
+    if args.get("remove_volumes"):
+        print("WARNING! THIS WILL REMOVE ALL VOLUMES CAUSING IRREVERSIBLE DATA LOSS!")
+        if input("Do you want to continue? [yes/no] ") != "yes":
+            print("Not continuing")
+            return
+
     if action == "upgrade":
         constellation.obj.restart(pull_images=True)
     elif action == "start":

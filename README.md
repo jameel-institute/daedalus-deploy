@@ -6,7 +6,7 @@ You should create a suitable virtual environment for installing the tool:
 ```
 python3 -m venv daedalus-venv
 ```
-...and activated:
+...and activate it:
 ```
 source daedalus-venv/bin/activate
 ```
