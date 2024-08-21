@@ -3,7 +3,7 @@ Deploy tool for the Daedalus app
 
 ## Installation
 
-Clone this repo and install dependencies with:
+Clone this repo and install dependencies with:s
 ```
 pip3 install --user -r requirements.txt
 ```

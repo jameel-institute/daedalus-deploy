@@ -99,7 +99,8 @@ def remove_config(path):
 def main(argv=None):
     path, config_name, action, args, options = parse(argv)
     config_name, cfg = load_config(path, config_name, options)
-    constellation = DaedalusConstellation(cfg)
+    use_vault = action == "start"
+    constellation = DaedalusConstellation(cfg, use_vault)
 
     if args.get("remove_volumes"):
         print("WARNING! THIS WILL REMOVE ALL VOLUMES CAUSING IRREVERSIBLE DATA LOSS!")
