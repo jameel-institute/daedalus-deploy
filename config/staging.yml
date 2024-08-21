@@ -1,8 +1,8 @@
 proxy:
   host: daedalus-dev.dide.ic.ac.uk
   ssl:
-    certificate: VAULT:secret/daedalus/ssl/dev:cert
-    key: VAULT:secret/daedalus/ssl/dev:key
+    certificate: VAULT:secret/daedalus/ssl/dev/cert:value
+    key: VAULT:secret/daedalus/ssl/dev/key:value
 web_app_db:
   postgres_user: VAULT:secret/daedalus/postgres/dev:user
   postgres_password: VAULT:secret/daedalus/postgres/dev:password

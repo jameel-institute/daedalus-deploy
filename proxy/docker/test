@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -ex
+
+HERE=$(dirname $0)
+. $HERE/common
+
+# This script does a basic test of the proxy image by running it up alongside the web app container and checking
+# it can see the home page
+
+docker network create daedalus
+
+# TODO: update branch when merged
+WEB_APP_TAG=$REGISTRY/$ORG/daedalus-web-app:jidea-59-dockerise-web-app
+
+docker run -d --run \
+ --name daedalus-web-app \
+ --network=daedalus \
+ $WEB_APP_TAG
+
+
+docker run -d  --rm \
+  --name daedalus-proxy \
+  --network=daedalus \
+  $TAG-SHA \
+  localhost daedalus-proxy http://daedalus-web-app:3000
