@@ -1,4 +1,5 @@
 proxy:
   host: localhost
 web_app_db:
-  password: changeme
+  postgres:
+    password: changeme

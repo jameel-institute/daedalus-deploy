@@ -1,6 +1,7 @@
 import json
 import requests
 import os
+from urllib3.exceptions import InsecureRequestWarning
 
 import constellation.docker_util as docker_util
 
@@ -9,11 +10,13 @@ from src import daedalus_constellation
 
 
 def test_start_daedalus():
+    requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
+
     # use a config that doesn't involve vault secrets
     cfg = daedalus_config.DaedalusConfig("config", "fakeproxy")
     constellation = daedalus_constellation.DaedalusConstellation(cfg, False)
+    constellation.start({})
     constellation.obj.status()
-    constellation.start()
 
     assert docker_util.network_exists("daedalus")
     assert docker_util.volume_exists("daedalus-data")
@@ -26,13 +29,11 @@ def test_start_daedalus():
     # ignore SSL
     session = requests.Session()
     session.verify = False
-    session.trust_env = False
-    os.environ['CURL_CA_BUNDLE'] = ""
     res = session.get("https://localhost", verify=False)
 
     assert res.status_code == 200
 
-    obj.destroy()
+    constellation.obj.destroy()
 
     assert not docker_util.network_exists("daedalus")
     assert not docker_util.volume_exists("daedalus-data")
