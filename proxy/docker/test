@@ -28,5 +28,5 @@ docker run -d \
 docker exec daedalus-proxy /usr/local/bin/build-self-signed-certificate /run/proxy GB London IC jameel-institute localhost
 
 sleep 1
-docker logs daedalus-proxy | 2>&1 grep "Certificate files detected. Running nginx." || (echo "Expected output not found"; exit 1)
+docker logs daedalus-proxy | 2>&1 grep "Certificate files detected. Running nginx" || (echo "Expected output not found"; exit 1)
 echo "Expected output was found"
