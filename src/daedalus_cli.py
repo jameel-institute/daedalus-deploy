@@ -106,7 +106,7 @@ def main(argv=None):
 
     if args.get("remove_volumes"):
         print("WARNING! THIS WILL REMOVE ALL VOLUMES CAUSING " +
-               "IRREVERSIBLE DATA LOSS!")
+              "IRREVERSIBLE DATA LOSS!")
         if input("Do you want to continue? [yes/no] ") != "yes":
             print("Not continuing")
             return
