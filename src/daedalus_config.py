@@ -37,9 +37,17 @@ class DaedalusConfig:
         db_key = "web_app_db"
         self.web_app_db_ref = self.get_image_reference(db_key, dat)
         self.web_app_db_port = config.config_integer(dat, [db_key, "port"])
-        self.web_app_db_data_location = config.config_string(dat, [db_key, "data_location"])
-        self.web_app_db_postgres_user = config.config_string(dat, [db_key, "postgres", "user"])
-        self.web_app_db_postgres_password = config.config_string(dat, [db_key, "postgres", "password"])
+        self.web_app_db_data_location = config.config_string(dat,
+                                                             [db_key,
+                                                              "data_location"])
+        self.web_app_db_postgres_user = config.config_string(dat,
+                                                             [db_key,
+                                                              "postgres",
+                                                              "user"])
+        self.web_app_db_postgres_password = config.config_string(dat,
+                                                                 [db_key,
+                                                                  "postgres",
+                                                                  "password"])
 
         # web_app
         self.web_app_ref = self.get_image_reference("web_app", dat)
@@ -49,9 +57,15 @@ class DaedalusConfig:
         proxy_key = "proxy"
         self.proxy_ref = self.get_image_reference(proxy_key, dat)
         self.proxy_host = config.config_string(dat, [proxy_key, "host"])
-        self.proxy_port_http = config.config_integer(dat, [proxy_key, "port_http"])
-        self.proxy_port_https = config.config_integer(dat, [proxy_key, "port_https"])
-        self.proxy_logs_location = config.config_string(dat, [proxy_key, "logs_location"])
+        self.proxy_port_http = config.config_integer(dat,
+                                                     [proxy_key,
+                                                      "port_http"])
+        self.proxy_port_https = config.config_integer(dat,
+                                                      [proxy_key,
+                                                       "port_https"])
+        self.proxy_logs_location = config.config_string(dat,
+                                                        [proxy_key,
+                                                         "logs_location"])
 
         if "ssl" in dat["proxy"]:
             self.proxy_ssl_certificate = config.config_string(dat,

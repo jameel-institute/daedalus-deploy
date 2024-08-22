@@ -84,7 +84,9 @@ def load_config(path, config_name=None, options=None):
             config_name or "<base>", when))
     else:
         if (config_name is None):
-            raise Exception("Config name must be provided when there is no previous deploy config,")
+            raise Exception(
+             "Config name must be provided when there is no \
+             previous deploy config,")
         cfg = DaedalusConfig(path, config_name, options=options)
     return config_name, cfg
 
@@ -103,7 +105,8 @@ def main(argv=None):
     constellation = DaedalusConstellation(cfg, use_vault)
 
     if args.get("remove_volumes"):
-        print("WARNING! THIS WILL REMOVE ALL VOLUMES CAUSING IRREVERSIBLE DATA LOSS!")
+        print("WARNING! THIS WILL REMOVE ALL VOLUMES CAUSING \
+               IRREVERSIBLE DATA LOSS!")
         if input("Do you want to continue? [yes/no] ") != "yes":
             print("Not continuing")
             return

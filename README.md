@@ -3,7 +3,7 @@ Deploy tool for the Daedalus app
 
 ## Installation
 
-Clone this repo and install dependencies with:s
+Clone this repo and install dependencies with:
 ```
 pip3 install --user -r requirements.txt
 ```
@@ -47,5 +47,5 @@ The configuration usage information is stored in `config/.last_deploy.`
 ## Deployment configurations
 There are three configurations
 - fakeproxy: for local testing
-- staging: for deployment onto our staging server at `daedalus.dev.dide.ic.ac.uk`
-- prod: tbd!
+- staging: for deployment onto our staging server at `daedalus-dev.dide.ic.ac.uk`
+- prod: on the way!
