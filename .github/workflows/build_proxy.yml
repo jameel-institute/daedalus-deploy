@@ -26,5 +26,7 @@ jobs:
         run: ./proxy/docker/build
       - name: Push SHA
         run: ./proxy/docker/push
+      - name: Test container
+        run: ./proxy/docker/test
       - name: Push branch tag
         run: ./proxy/docker/push-branch-tag

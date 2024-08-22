@@ -12,14 +12,21 @@ docker network create daedalus
 # TODO: update branch when merged
 WEB_APP_TAG=$REGISTRY/$ORG/daedalus-web-app:jidea-59-dockerise-web-app
 
-docker run -d --run \
+docker run -d \
  --name daedalus-web-app \
  --network=daedalus \
+ -e DATABASE_URL=postgresql://daedalus-web-app-user:changeme@not-a-db:5432/daedalus-web-app \
  $WEB_APP_TAG
 
-
-docker run -d  --rm \
+docker run -d \
   --name daedalus-proxy \
   --network=daedalus \
-  $TAG-SHA \
+  -p 443:443 \
+  $TAG_SHA \
   localhost daedalus-proxy http://daedalus-web-app:3000
+
+docker exec daedalus-proxy /usr/local/bin/build-self-signed-certificate /run/proxy GB London IC jameel-institute localhost
+
+sleep 1
+docker logs daedalus-proxy | 2>&1 grep "Certificate files detected. Running nginxx." || (echo "Expected output not found"; exit 1)
+echo "Expected output was found"
