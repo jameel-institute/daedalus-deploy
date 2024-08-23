@@ -68,3 +68,10 @@ exclude_lines = [
   "if __name__ == .__main__.:",
   "if TYPE_CHECKING:",
 ]
+
+[tool.ruff.lint]
+ignore = [
+  "T201", # allow print
+  "S301", # allow pickle
+  "TRY002" # allow Exception
+]

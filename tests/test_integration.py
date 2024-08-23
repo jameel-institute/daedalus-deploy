@@ -1,8 +1,4 @@
-import json
-import requests
-import os
-
-import constellation.docker_util as docker_util
+from constellation import docker_util
 
 from src.daedalus_deploy.config import DaedalusConfig
 from src.daedalus_deploy.daedalus_constellation import DaedalusConstellation

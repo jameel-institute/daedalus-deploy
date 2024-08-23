@@ -13,11 +13,12 @@ Options:
   --kill              Kill the containers (faster, but possible db corruption)
 """
 
-import docopt
 import os
 import os.path
 import pickle
 import time
+
+import docopt
 import timeago
 
 from daedalus_deploy.config import DaedalusConfig
@@ -35,15 +36,11 @@ def parse(argv=None):
         options = {}
     elif dat["stop"]:
         action = "stop"
-        args = {"kill": dat["--kill"],
-                "remove_network": dat["--network"],
-                "remove_volumes": dat["--volumes"]}
+        args = {"kill": dat["--kill"], "remove_network": dat["--network"], "remove_volumes": dat["--volumes"]}
         options = {}
     elif dat["destroy"]:
         action = "stop"
-        args = {"kill": True,
-                "remove_network": True,
-                "remove_volumes": True}
+        args = {"kill": True, "remove_network": True, "remove_volumes": True}
         options = {}
     elif dat["status"]:
         action = "status"
@@ -61,17 +58,14 @@ def path_last_deploy(path):
 
 
 def save_config(path, config_name, cfg):
-    dat = {"config_name": config_name,
-           "time": time.time(),
-           "data": cfg}
+    dat = {"config_name": config_name, "time": time.time(), "data": cfg}
     with open(path_last_deploy(path), "wb") as f:
         pickle.dump(dat, f)
 
 
 def read_config(path):
     with open(path_last_deploy(path), "rb") as f:
-        dat = pickle.load(f)
-    return dat
+        return pickle.load(f)
 
 
 def load_config(path, config_name=None, options=None):
@@ -80,13 +74,11 @@ def load_config(path, config_name=None, options=None):
         when = timeago.format(dat["time"])
         cfg = DaedalusConfig(path, dat["config_name"], options=options)
         config_name = dat["config_name"]
-        print("[Loaded configuration '{}' ({})]".format(
-            config_name or "<base>", when))
+        print("[Loaded configuration '{}' ({})]".format(config_name or "<base>", when))
     else:
-        if (config_name is None):
-            raise Exception(
-             "Config name must be provided when there is no " +
-             "previous deploy config,")
+        if config_name is None:
+            msg = "Config name must be provided when there is no previous deploy config,"
+            raise Exception(msg)
         cfg = DaedalusConfig(path, config_name, options=options)
     return config_name, cfg
 
@@ -105,8 +97,7 @@ def main(argv=None):
     constellation = DaedalusConstellation(cfg, use_vault)
 
     if args.get("remove_volumes"):
-        print("WARNING! THIS WILL REMOVE ALL VOLUMES CAUSING " +
-              "IRREVERSIBLE DATA LOSS!")
+        print("WARNING! THIS WILL REMOVE ALL VOLUMES CAUSING " "IRREVERSIBLE DATA LOSS!")
         if input("Do you want to continue? [yes/no] ") != "yes":
             print("Not continuing")
             return

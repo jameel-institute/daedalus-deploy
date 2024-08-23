@@ -5,7 +5,7 @@ from src.daedalus_deploy.config import DaedalusConfig
 
 @pytest.fixture
 def cfg():
-    yield DaedalusConfig("config", "fakeproxy")
+    return DaedalusConfig("config", "fakeproxy")
 
 
 def test_base_config(cfg):
