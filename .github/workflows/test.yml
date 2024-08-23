@@ -6,8 +6,6 @@ on:
     branches:
       - '*'
 name: Tests
-env:
-  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -25,9 +23,3 @@ jobs:
         run: hatch test --cover
       - name: Lint
         run: hatch fmt --check
-      - name: Upload to Codecov
-        uses: codecov/codecov-action@v4
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          slug: jameel-institute/daedalus-deploy
-          fail_ci_if_error: true
