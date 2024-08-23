@@ -5,6 +5,7 @@ on:
   pull_request:
     branches:
       - '*'
+name: Build proxy
 env:
   PROXY_TAG: ghcr.io/jameel-institute/daedalus-proxy
 jobs:
