@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -e
+
+GIT_SHA=$(git rev-parse --short=7 HEAD)
+if [[ -v "BRANCH_NAME" ]]; then
+    GIT_BRANCH=${BRANCH_NAME}
+else
+    GIT_BRANCH=$(git symbolic-ref --short HEAD)
+fi
+
+REGISTRY=ghcr.io
+ORG=jameel-institute
+PROXY_IMAGE_NAME=daedalus-proxy
+
+PROXY_TAG="${REGISTRY}/${ORG}/${PROXY_IMAGE_NAME}"
+TAG_SHA="${PROXY_TAG}:${GIT_SHA}"
+TAG_BRANCH="${PROXY_TAG}:${GIT_BRANCH}"
