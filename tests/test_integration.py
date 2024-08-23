@@ -8,7 +8,7 @@ def test_start_daedalus():
     # use a config that doesn't involve vault secrets
     cfg = DaedalusConfig("config", "fakeproxy")
     constellation = DaedalusConstellation(cfg, False)
-    constellation.start({})
+    constellation.start({"pull_images": True})
     constellation.obj.status()
 
     assert docker_util.network_exists("daedalus")

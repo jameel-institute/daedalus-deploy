@@ -6,6 +6,8 @@ on:
     branches:
       - '*'
 name: Tests
+env:
+  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -20,6 +22,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install hatch
       - name: Run tests
-        run: hatch test
+        run: hatch test --cover
       - name: Lint
         run: hatch fmt --check
+      - name: Upload to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          fail_ci_if_error: true
