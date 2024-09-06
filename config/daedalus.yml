@@ -20,8 +20,7 @@ web_app_db:
   image:
     repo: ghcr.io/jameel-institute
     name: daedalus-web-app-db
-    # TODO: update to main when merged
-    tag: jidea-59-dockerise-web-app
+    tag: main
   port: 5432
   data_location: /pgdata
   postgres:
@@ -30,6 +29,5 @@ web_app:
   image:
     repo: ghcr.io/jameel-institute
     name: daedalus-web-app
-    # TODO: update to main when merged
-    tag: jidea-59-dockerise-web-app
+    tag: main
   port: 3000
