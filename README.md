@@ -8,23 +8,9 @@ Deploy tool for the Daedalus app
 
 ## Installation
 
-This project is built with hatch. It is not published to PyPI, so must be built and installed from local sources.
-Clone this repo then:
-```
-hatch build 
-pip3 install dist/daedalus_deploy-{version}.tar.gz
-```
-replacing `{version}` with the current version (`hatch version`).
+This project is built with hatch. It is not published to PyPI, so must be run using hatch from local source. 
 
-If you have a newer version of pip3, you may need to create a suitable virtual environment for installing the tool:
-```
-python3 -m venv daedalus-venv
-```
-...and activate it:
-```
-source daedalus-venv/bin/activate
-```
-(You can deactivate the venv later if required with `deactivate`.)
+Clone this repo, then: `hatch shell` before using the deploy tool as below. (You can exit the hatch shell with `exit`.)
 
 ## Usage
 
@@ -42,6 +28,8 @@ Options:
   --network                 Remove network
   --kill                    Kill the containers (faster, but possible db corruption)
 ```
+
+For example, you can start the local dev deploy (with fake proxy ssl) using: `daedalus start fakeproxy`.
 
 Once a configuration is set during `start`, it will be reused by subsequent commands
 (`stop`, `status`, `upgrade`, `user`, etc) and removed during destroy.
