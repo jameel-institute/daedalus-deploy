@@ -1,0 +1,5 @@
+proxy:
+  host: localhost
+web_app_db:
+  postgres:
+    password: changeme

@@ -1,0 +1,45 @@
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - '*'
+name: Build proxy
+env:
+  PROXY_TAG: ghcr.io/jameel-institute/daedalus-proxy
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Login to GHCR (GitHub Packages)
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - id: ci-env
+        name: Set branch and SHA
+        shell: bash
+        run: |
+          if [ "${{github.event_name}}" = "pull_request" ];
+          then
+            long_sha=${{ github.event.pull_request.head.sha }}
+            echo "CI_BRANCH=${{ github.head_ref }}" >> $GITHUB_OUTPUT
+          else
+            long_sha=${GITHUB_SHA}
+            echo "CI_BRANCH=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          fi
+          echo "CI_SHA=${long_sha:0:7}" >> $GITHUB_OUTPUT
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          file: ./proxy/Dockerfile
+          tags: |
+            ${{env.PROXY_TAG}}:${{steps.ci-env.outputs.CI_SHA}}
+            ${{env.PROXY_TAG}}:${{steps.ci-env.outputs.CI_BRANCH}}

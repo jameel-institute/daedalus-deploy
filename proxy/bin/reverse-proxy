@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+set -eu
+
+if [ "$#" -eq 3 ]; then
+    export HTTP_HOST=$1
+    export SERVER_NAME=$2
+    export DAEDALUS_APP=$3
+else
+    echo "Usage: <hostname> <servername> <daedalusapp>"
+    echo "e.g. docker run ... mrcide/daedalus-proxy:main localhost daedalus-proxy http://daedalus-web-app:3000"
+    exit 1
+fi
+
+echo "We will listen on ports 80 (http) and 443 (https)"
+echo "with hostname $HTTP_HOST and servername $SERVER_NAME and daedalus endpoint $DAEDALUS_APP"
+
+envsubst '$HTTP_HOST,$SERVER_NAME,$DAEDALUS_APP' \
+         < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf
+
+# These paths must match the paths as used in the nginx.conf
+PATH_CONFIG=/run/proxy
+PATH_CERT="$PATH_CONFIG/certificate.pem"
+PATH_KEY="$PATH_CONFIG/key.pem"
+
+mkdir -p $PATH_CONFIG
+
+# Wait for the ssl certificates to be copied in or generated
+echo "Waiting for certificates at $PATH_CERT and $PATH_KEY"
+while [ ! -e $PATH_CERT ] || [ ! -e $PATH_KEY ]; do
+  sleep 1
+done
+
+echo "Certificate files detected. Running nginx"
+exec nginx -g "daemon off;"

@@ -1,0 +1,77 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "daedalus_deploy"
+dynamic = ["version"]
+description = "Deployment tool for Daedalus"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+keywords = []
+authors = [
+  { name = "Emma Russell", email = "e.russell@imperial.ac.uk" },
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+]
+dependencies = [
+  "constellation",
+  "docopt",
+  "pytest",
+  "timeago",
+  "requests"
+]
+
+[project.urls]
+Documentation = "https://github.com/jameel-institute/daedalus-deploy#readme"
+Issues = "https://github.com/jameel-institute/daedalus-deploy/issues"
+Source = "https://github.com/jameel-institute/daedalus-deploy"
+
+[project.scripts]
+daedalus = "daedalus_deploy.cli:main"
+
+[tool.hatch.version]
+path = "src/daedalus_deploy/__about__.py"
+
+[tool.hatch.envs.types]
+extra-dependencies = [
+  "mypy>=1.0.0",
+]
+[tool.hatch.envs.types.scripts]
+check = "mypy --install-types --non-interactive {args:src/daedalus_deploy tests}"
+
+[tool.coverage.run]
+source_pkgs = ["daedalus_deploy", "tests"]
+branch = true
+parallel = true
+omit = [
+  "src/daedalus_deploy/__about__.py",
+]
+
+[tool.coverage.paths]
+daedalus_deploy = ["src/daedalus_deploy", "*/daedalus-deploy/src/daedalus_deploy"]
+tests = ["tests", "*/daedalus-deploy/tests"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "no cov",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+]
+
+[tool.ruff.lint]
+ignore = [
+  "T201", # allow print
+  "S301", # allow pickle
+  "TRY002" # allow Exception
+]
