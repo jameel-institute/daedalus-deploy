@@ -5,8 +5,7 @@ proxy:
   image:
     repo: ghcr.io/jameel-institute
     name: daedalus-proxy
-    # TODO: update to main when merged
-    tag: jidea-60-hatch
+    tag: main
   port_http: 80
   port_https: 443
   logs_location: /var/log/nginx
