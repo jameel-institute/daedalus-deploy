@@ -12,8 +12,6 @@ class DaedalusConfig:
         self.network = config.config_string(dat, ["docker", "network"])
         self.container_prefix = config.config_string(dat, ["docker", "prefix"])
 
-        self.containers = {"api": "api", "web-app-db": "web-app-db", "web-app": "web-app", "proxy": "proxy"}
-
         self.volumes = {
           "daedalus-redis": "daedalus-redis",
           "daedalus-model-results": "daedalus-model-results",

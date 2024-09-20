@@ -13,15 +13,20 @@ def test_base_config(cfg):
     assert cfg.vault.url is None
     assert cfg.network == "daedalus"
     assert cfg.container_prefix == "daedalus"
-    assert cfg.containers["api"] == "api"
-    assert cfg.containers["web-app-db"] == "web-app-db"
-    assert cfg.containers["web-app"] == "web-app"
-    assert cfg.containers["proxy"] == "proxy"
+    assert cfg.volumes["daedalus-redis"] == "daedalus-redis"
+    assert cfg.volumes["daedalus-model-results"] == "daedalus-model-results"
     assert cfg.volumes["daedalus-data"] == "daedalus-data"
     assert cfg.volumes["proxy-logs"] == "proxy-logs"
 
 
+def test_redis(cfg):
+    assert cfg.redis_ref.repo == "library"
+    assert cfg.redis_ref.name == "redis"
+
+
 def test_api(cfg):
+    assert cfg.api_queue_id == "daedalus-queue"
+    assert cfg.api_number_of_workers == 1
     assert cfg.api_ref.repo == "mrcide"
     assert cfg.api_ref.name == "daedalus.api"
     assert cfg.api_port == 8001
