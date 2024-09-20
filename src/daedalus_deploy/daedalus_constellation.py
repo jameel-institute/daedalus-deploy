@@ -24,7 +24,7 @@ class DaedalusConstellation:
           "REDIS_CONTAINER_NAME": "daedalus-redis"
         }
         api_mounts = [constellation.ConstellationMount("daedalus-model-results", "/daedalus/results")]
-        # TODO: make as many of these as number of workers!!
+        # TODO: make as many of these as number of workers!! Use ConstellationService
         api_worker = constellation.ConstellationContainer(
           "api-worker",
           cfg.api_ref,
@@ -38,7 +38,7 @@ class DaedalusConstellation:
           "api",
           cfg.api_ref,
           environment=api_env,
-          mounts=api_mounts
+          mounts=api_mounts,
           entrypoint="/usr/local/bin/daedalus.api"
         )
 
@@ -115,6 +115,7 @@ class DaedalusConstellation:
     def rrq_configure(self, container, cfg):
         # The container here is the redis container - after it's running we attempt to configure the queue by running
         # the api with the configure entrypoint - we expect this to fail if the queue is already configured
+        print("Configuring rrq queue")
         env = {
           "DAEDALUS_QUEUE_ID": cfg.api_queue_id,
           "REDIS_CONTAINER_NAME": "daedalus-redis"
@@ -125,7 +126,6 @@ class DaedalusConstellation:
           entrypoint="/usr/local/bin/daedalus.api.configure",
           environment=env
         )
-        configure_container.pull_image()
         # TODO: might need to wrap this in try?
-        configure_container.start()
+        configure_container.start(cfg.container_prefix, self.obj.network, None)
 

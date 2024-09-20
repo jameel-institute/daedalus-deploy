@@ -13,7 +13,7 @@ redis:
   image:
     repo: library
     name: redis
-    tag:
+    tag: latest
 api:
   image:
     repo: mrcide
