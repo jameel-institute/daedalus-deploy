@@ -14,15 +14,22 @@ class DaedalusConstellation:
         redis = constellation.ConstellationContainer(
           "redis",
           cfg.redis_ref,
-          configure=self.rrq_configure,
           mounts=redis_mounts
         )
 
-        # 2. api worker
+        # 2. api configure
         api_env = {
           "DAEDALUS_QUEUE_ID": cfg.api_queue_id,
           "REDIS_CONTAINER_NAME": "daedalus-redis"
         }
+        api_configure = constellation.ConstellationContainer(
+          "api-configure",
+          cfg.api_ref,
+          entrypoint="/usr/local/bin/daedalus.api.configure",
+          environment=api_env
+        )
+
+        # 2. api worker
         api_mounts = [constellation.ConstellationMount("daedalus-model-results", "/daedalus/results")]
         # TODO: make as many of these as number of workers!! Use ConstellationService
         api_worker = constellation.ConstellationContainer(
@@ -78,7 +85,7 @@ class DaedalusConstellation:
             args=[cfg.proxy_host, cfg.proxy_ref.name, daedalus_app_url],
         )
 
-        containers = [redis, api_worker, api, web_app_db, web_app, proxy]
+        containers = [redis, api_configure, api_worker, api, web_app_db, web_app, proxy]
 
         obj = constellation.Constellation(
             "daedalus", cfg.container_prefix, containers, cfg.network, cfg.volumes, data=cfg
@@ -112,20 +119,21 @@ class DaedalusConstellation:
             ]
             docker_util.exec_safely(container, args)
 
-    def rrq_configure(self, container, cfg):
+    #def rrq_configure(self, container, cfg):
         # The container here is the redis container - after it's running we attempt to configure the queue by running
-        # the api with the configure entrypoint - we expect this to fail if the queue is already configured
-        print("Configuring rrq queue")
-        env = {
-          "DAEDALUS_QUEUE_ID": cfg.api_queue_id,
-          "REDIS_CONTAINER_NAME": "daedalus-redis"
-        }
-        configure_container = constellation.ConstellationContainer(
-          "api_configure",
-          cfg.api_ref,
-          entrypoint="/usr/local/bin/daedalus.api.configure",
-          environment=env
-        )
-        # TODO: might need to wrap this in try?
-        configure_container.start(cfg.container_prefix, self.obj.network, None)
-
+        # the api with the configure entrypoint - the entrypoint will fail if the queue is already configured, but
+        # that shouldn't throw an exception here
+        # TODO: SINCE THIS *DOESN'T THROW AN EXCEPTION WE SHOULD JUST BE ABLE TO INCLUDE THE CONFIGURE CONTAINER IN THE
+        # CONSTELLATION!! THen don't need to worry about removing it...
+        #print("Configuring rrq queue")
+        #env = {
+        #  "DAEDALUS_QUEUE_ID": cfg.api_queue_id,
+        #  "REDIS_CONTAINER_NAME": "daedalus-redis"
+        #}
+        #configure_container = constellation.ConstellationContainer(
+        #  "api-configure",
+        #  cfg.api_ref,
+        #  entrypoint="/usr/local/bin/daedalus.api.configure",
+        #  environment=env
+        #)
+        #configure_container.start(cfg.container_prefix, self.obj.network, None)
