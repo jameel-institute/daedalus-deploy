@@ -9,12 +9,19 @@ proxy:
   port_http: 80
   port_https: 443
   logs_location: /var/log/nginx
+redis:
+  image:
+    repo: library
+    name: redis
+    tag:
 api:
   image:
     repo: mrcide
     name: daedalus.api
     tag: latest
   port: 8001
+  queue_id: daedalus-queue
+  number_of_workers: 1
 web_app_db:
   image:
     repo: ghcr.io/jameel-institute

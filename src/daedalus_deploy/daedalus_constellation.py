@@ -9,10 +9,40 @@ class DaedalusConstellation:
         if use_vault:
             vault.resolve_secrets(cfg, cfg.vault.client())
 
-        # 1. api
-        api = constellation.ConstellationContainer("api", cfg.api_ref)
+        # 1. redis
+        redis_mounts = [constellation.ConstellationMount("daedalus-redis", "/data")]
+        redis = constellation.ConstellationContainer(
+          "redis",
+          cfg.redis_ref,
+          configure=self.rrq_configure,
+          mounts=redis_mounts
+        )
 
-        # 2. web_app_db
+        # 2. api worker
+        api_env = {
+          "DAEDALUS_QUEUE_ID": cfg.api_queue_id,
+          "REDIS_CONTAINER_NAME": "daedalus-redis"
+        }
+        api_mounts = [constellation.ConstellationMount("daedalus-model-results", "/daedalus/results")]
+        # TODO: make as many of these as number of workers!!
+        api_worker = constellation.ConstellationContainer(
+          "api-worker",
+          cfg.api_ref,
+          environment=api_env,
+          mounts=api_mounts,
+          entrypoint="/usr/local/bin/daedalus.api.worker"
+        )
+
+        # 3. api
+        api = constellation.ConstellationContainer(
+          "api",
+          cfg.api_ref,
+          environment=api_env,
+          mounts=api_mounts
+          entrypoint="/usr/local/bin/daedalus.api"
+        )
+
+        # 4. web_app_db
         db_user = cfg.web_app_db_postgres_user
         db_password = cfg.web_app_db_postgres_password
         web_app_db_env = {
@@ -28,14 +58,14 @@ class DaedalusConstellation:
             mounts=web_app_db_mounts,
         )
 
-        # 3. web_app
+        # 5. web_app
         db_url = (
             f"postgresql://{db_user}:{db_password}@{cfg.web_app_db_ref.name}:{cfg.web_app_db_port}/daedalus-web-app"
         )
         web_app_env = {"DATABASE_URL": db_url, "NUXT_R_API_BASE": f"http://daedalus-api:{cfg.api_port}/"}
         web_app = constellation.ConstellationContainer("web-app", cfg.web_app_ref, environment=web_app_env)
 
-        # 4. proxy
+        # 6. proxy
         proxy_ports = [cfg.proxy_port_http, cfg.proxy_port_https]
         proxy_mounts = [constellation.ConstellationMount("proxy-logs", cfg.proxy_logs_location)]
         daedalus_app_url = f"http://{cfg.container_prefix}-{web_app.name}:{cfg.web_app_port}"
@@ -48,7 +78,7 @@ class DaedalusConstellation:
             args=[cfg.proxy_host, cfg.proxy_ref.name, daedalus_app_url],
         )
 
-        containers = [api, web_app_db, web_app, proxy]
+        containers = [redis, api_worker, api, web_app_db, web_app, proxy]
 
         obj = constellation.Constellation(
             "daedalus", cfg.container_prefix, containers, cfg.network, cfg.volumes, data=cfg
@@ -81,3 +111,21 @@ class DaedalusConstellation:
                 cfg.proxy_host,
             ]
             docker_util.exec_safely(container, args)
+
+    def rrq_configure(self, container, cfg):
+        # The container here is the redis container - after it's running we attempt to configure the queue by running
+        # the api with the configure entrypoint - we expect this to fail if the queue is already configured
+        env = {
+          "DAEDALUS_QUEUE_ID": cfg.api_queue_id,
+          "REDIS_CONTAINER_NAME": "daedalus-redis"
+        }
+        configure_container = constellation.ConstellationContainer(
+          "api_configure",
+          cfg.api_ref,
+          entrypoint="/usr/local/bin/daedalus.api.configure",
+          environment=env
+        )
+        configure_container.pull_image()
+        # TODO: might need to wrap this in try?
+        configure_container.start()
+

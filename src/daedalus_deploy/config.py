@@ -14,11 +14,21 @@ class DaedalusConfig:
 
         self.containers = {"api": "api", "web-app-db": "web-app-db", "web-app": "web-app", "proxy": "proxy"}
 
-        self.volumes = {"daedalus-data": "daedalus-data", "proxy-logs": "proxy-logs"}
+        self.volumes = {
+          "daedalus-redis": "daedalus-redis",
+          "daedalus-model-results": "daedalus-model-results",
+          "daedalus-data": "daedalus-data",
+          "proxy-logs": "proxy-logs"
+        }
+
+        # redis
+        self.redis_ref = self.get_image_reference("redis", dat)
 
         # api
         self.api_ref = self.get_image_reference("api", dat)
         self.api_port = config.config_integer(dat, ["api", "port"])
+        self.api_queue_id = config.config_string(dat, ["api", "queue_id"])
+        self.api_number_of_workers = config.config_integer(dat, ["api", "number_of_workers"])
 
         # web_app_db
         db_key = "web_app_db"
