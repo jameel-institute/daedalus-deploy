@@ -13,10 +13,10 @@ class DaedalusConfig:
         self.container_prefix = config.config_string(dat, ["docker", "prefix"])
 
         self.volumes = {
-          "daedalus-redis": "daedalus-redis",
-          "daedalus-model-results": "daedalus-model-results",
-          "daedalus-data": "daedalus-data",
-          "proxy-logs": "proxy-logs"
+            "daedalus-redis": "daedalus-redis",
+            "daedalus-model-results": "daedalus-model-results",
+            "daedalus-data": "daedalus-data",
+            "proxy-logs": "proxy-logs",
         }
 
         # redis

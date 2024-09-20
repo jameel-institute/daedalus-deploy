@@ -11,44 +11,30 @@ class DaedalusConstellation:
 
         # 1. redis
         redis_mounts = [constellation.ConstellationMount("daedalus-redis", "/data")]
-        redis = constellation.ConstellationContainer(
-          "redis",
-          cfg.redis_ref,
-          mounts=redis_mounts
-        )
+        redis = constellation.ConstellationContainer("redis", cfg.redis_ref, mounts=redis_mounts)
 
         # 2. api configure (configures the queue - this only needs to happen on first start.
         # The entrypoint will fail subsequently, but this doesn't prevent the constellation from running.
         # This is an ephemeral container which will exit after doing the queue configuration.)
-        api_env = {
-          "DAEDALUS_QUEUE_ID": cfg.api_queue_id,
-          "REDIS_CONTAINER_NAME": "daedalus-redis"
-        }
+        api_env = {"DAEDALUS_QUEUE_ID": cfg.api_queue_id, "REDIS_CONTAINER_NAME": "daedalus-redis"}
         api_configure = constellation.ConstellationContainer(
-          "api-configure",
-          cfg.api_ref,
-          entrypoint="/usr/local/bin/daedalus.api.configure",
-          environment=api_env
+            "api-configure", cfg.api_ref, entrypoint="/usr/local/bin/daedalus.api.configure", environment=api_env
         )
 
         # 3. api workers
         api_mounts = [constellation.ConstellationMount("daedalus-model-results", "/daedalus/results")]
         api_workers = constellation.ConstellationService(
-          "api-worker",
-          cfg.api_ref,
-          cfg.api_number_of_workers,
-          environment=api_env,
-          mounts=api_mounts,
-          entrypoint="/usr/local/bin/daedalus.api.worker"
+            "api-worker",
+            cfg.api_ref,
+            cfg.api_number_of_workers,
+            environment=api_env,
+            mounts=api_mounts,
+            entrypoint="/usr/local/bin/daedalus.api.worker",
         )
 
         # 4. api
         api = constellation.ConstellationContainer(
-          "api",
-          cfg.api_ref,
-          environment=api_env,
-          mounts=api_mounts,
-          entrypoint="/usr/local/bin/daedalus.api"
+            "api", cfg.api_ref, environment=api_env, mounts=api_mounts, entrypoint="/usr/local/bin/daedalus.api"
         )
 
         # 5. web_app_db
