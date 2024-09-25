@@ -3,6 +3,8 @@ proxy:
   ssl:
     certificate: VAULT:secret/daedalus/ssl/production/cert:value
     key: VAULT:secret/daedalus/ssl/production/key:value
+api:
+  number_of_workers: 4
 web_app_db:
   postgres:
     user: VAULT:secret/daedalus/postgres/dev:user
