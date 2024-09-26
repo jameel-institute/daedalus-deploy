@@ -14,6 +14,8 @@ Clone this repo, then: `hatch shell` before using the deploy tool as below. (You
 
 ## Usage
 
+Make sure you are using `hatch shell` before running the below commands.
+
 ```
 Usage:
   daedalus start [--pull] [<configname>]
