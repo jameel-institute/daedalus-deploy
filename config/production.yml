@@ -1,8 +1,8 @@
 proxy:
   host: daedalus.jameel-institute.org
   ssl:
-    certificate: VAULT:secret/daedalus/ssl/production/cert:value
-    key: VAULT:secret/daedalus/ssl/production/key:value
+    certificate: VAULT:secret/daedalus/ssl/jameel_institute_org/cert:value
+    key: VAULT:secret/daedalus/ssl/jameel_institute_org/key:value
 api:
   number_of_workers: 4
 web_app_db:
