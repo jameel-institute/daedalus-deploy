@@ -1,5 +1,5 @@
 proxy:
-  host: daedalus.dide.ic.ac.uk
+  host: daedalus.jameel-institute.org
   ssl:
     certificate: VAULT:secret/daedalus/ssl/production/cert:value
     key: VAULT:secret/daedalus/ssl/production/key:value

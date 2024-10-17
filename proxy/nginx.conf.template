@@ -80,7 +80,7 @@ http {
         server_name _;
 
         location / {
-            return 301 https://${HTTP_HOST}:443$request_uri;
+            return 301 https://$host$request_uri;
         }
     }
 }
