@@ -17,7 +17,12 @@ class DaedalusConstellation:
         api_env = {"DAEDALUS_QUEUE_ID": cfg.api_queue_id, "REDIS_CONTAINER_NAME": "daedalus-redis"}
         api_mounts = [constellation.ConstellationMount("daedalus-model-results", "/daedalus/results")]
         api = constellation.ConstellationContainer(
-            "api", cfg.api_ref, environment=api_env, mounts=api_mounts, entrypoint="/usr/local/bin/daedalus.api"
+            "api",
+            cfg.api_ref,
+            environment=api_env,
+            mounts=api_mounts,
+            configure=self.api_wait,
+            entrypoint="/usr/local/bin/daedalus.api"
         )
 
         # 3. api workers
@@ -80,6 +85,11 @@ class DaedalusConstellation:
     def db_configure(self, container, _):
         print("[web-app-dn] Waiting for db")
         args = ["wait-for-db"]
+        docker_util.exec_safely(container, args)
+
+    def api_wait(self, container, _):
+        print("Waiting for api")
+        args = ["sleep", "5"]
         docker_util.exec_safely(container, args)
 
     def proxy_configure(self, container, cfg):
