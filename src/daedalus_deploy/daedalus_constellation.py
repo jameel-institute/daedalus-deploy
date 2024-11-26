@@ -15,12 +15,12 @@ class DaedalusConstellation:
 
         # 2. api
         api_env = {"DAEDALUS_QUEUE_ID": cfg.api_queue_id, "REDIS_CONTAINER_NAME": "daedalus-redis"}
+        api_mounts = [constellation.ConstellationMount("daedalus-model-results", "/daedalus/results")]
         api = constellation.ConstellationContainer(
             "api", cfg.api_ref, environment=api_env, mounts=api_mounts, entrypoint="/usr/local/bin/daedalus.api"
         )
 
         # 3. api workers
-        api_mounts = [constellation.ConstellationMount("daedalus-model-results", "/daedalus/results")]
         api_workers = constellation.ConstellationService(
             "api-worker",
             cfg.api_ref,
