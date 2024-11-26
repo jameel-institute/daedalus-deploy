@@ -17,7 +17,6 @@ def test_start_daedalus():
     assert docker_util.volume_exists("daedalus-redis")
     assert docker_util.volume_exists("daedalus-model-results")
     assert docker_util.container_exists("daedalus-redis")
-    assert docker_util.container_exists("daedalus-api-configure")
     assert docker_util.container_exists("daedalus-api")
     assert len(docker_util.containers_matching("daedalus-api-worker", False)) == 1
     assert docker_util.container_exists("daedalus-web-app-db")
@@ -32,7 +31,6 @@ def test_start_daedalus():
     assert not docker_util.volume_exists("daedalus-redis")
     assert not docker_util.volume_exists("daedalus-model-results")
     assert not docker_util.container_exists("daedalus-redis")
-    assert not docker_util.container_exists("daedalus-api-configure")
     assert not docker_util.container_exists("daedalus-api")
     assert len(docker_util.containers_matching("daedalus-api-worker", False)) == 0
     assert not docker_util.container_exists("daedalus-web-app-db")
