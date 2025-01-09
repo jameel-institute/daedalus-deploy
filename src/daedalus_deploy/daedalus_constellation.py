@@ -88,8 +88,9 @@ class DaedalusConstellation:
         docker_util.exec_safely(container, args)
 
     def api_wait(self, container, _):
+        # Give the api a couple of seconds to configure the queue
         print("Waiting for api")
-        args = ["sleep", "5"]
+        args = ["sleep", "2"]
         docker_util.exec_safely(container, args)
 
     def proxy_configure(self, container, cfg):
