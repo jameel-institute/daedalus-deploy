@@ -71,7 +71,7 @@ class DaedalusConstellation:
             args=[cfg.proxy_host, cfg.proxy_ref.name, daedalus_app_url],
         )
 
-        containers = [redis, api_workers, api, web_app_db, web_app, proxy]
+        containers = [redis, api, api_workers, web_app_db, web_app, proxy]
 
         obj = constellation.Constellation(
             "daedalus", cfg.container_prefix, containers, cfg.network, cfg.volumes, data=cfg

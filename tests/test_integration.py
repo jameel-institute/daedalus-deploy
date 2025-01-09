@@ -1,5 +1,6 @@
 from constellation import docker_util
 import math
+import time
 
 from src.daedalus_deploy.config import DaedalusConfig
 from src.daedalus_deploy.daedalus_constellation import DaedalusConstellation
@@ -11,7 +12,6 @@ def wait_for_container_matching(prefix, stopped, poll=0.1, timeout=5):
             found = True
             break
         time.sleep(poll)
-        container.reload()
     return found
 
 
