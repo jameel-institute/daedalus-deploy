@@ -6,7 +6,7 @@ from constellation import docker_util
 from src.daedalus_deploy.config import DaedalusConfig
 from src.daedalus_deploy.daedalus_constellation import DaedalusConstellation
 
-
+# TODO: Maybe I don't need this any more!?
 def wait_for_container_matching(prefix, stopped, poll=0.1, timeout=5):
     found = False
     for _ in range(math.ceil(timeout / poll)):
@@ -31,7 +31,8 @@ def test_start_daedalus():
     assert docker_util.volume_exists("daedalus-model-results")
     assert docker_util.container_exists("daedalus-redis")
     assert docker_util.container_exists("daedalus-api")
-    assert wait_for_container_matching("daedalus-api-worker", False)
+    assert len(docker_util.containers_matching("daedalus-api-worker", False)) == 1
+    #assert wait_for_container_matching("daedalus-api-worker", False)
     assert docker_util.container_exists("daedalus-web-app-db")
     assert docker_util.container_exists("daedalus-web-app")
     assert docker_util.container_exists("daedalus-proxy")
