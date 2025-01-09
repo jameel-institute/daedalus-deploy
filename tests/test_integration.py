@@ -1,13 +1,15 @@
-from constellation import docker_util
 import math
 import time
+
+from constellation import docker_util
 
 from src.daedalus_deploy.config import DaedalusConfig
 from src.daedalus_deploy.daedalus_constellation import DaedalusConstellation
 
+
 def wait_for_container_matching(prefix, stopped, poll=0.1, timeout=5):
     found = False
-    for i in range(math.ceil(timeout / poll)):
+    for _ in range(math.ceil(timeout / poll)):
         if len(docker_util.containers_matching(prefix, stopped)) > 0:
             found = True
             break

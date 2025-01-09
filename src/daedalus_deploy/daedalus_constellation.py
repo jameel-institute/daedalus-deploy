@@ -22,7 +22,7 @@ class DaedalusConstellation:
             environment=api_env,
             mounts=api_mounts,
             configure=self.api_wait,
-            entrypoint="/usr/local/bin/daedalus.api"
+            entrypoint="/usr/local/bin/daedalus.api",
         )
 
         # 3. api workers
