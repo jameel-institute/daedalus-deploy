@@ -13,16 +13,19 @@ class DaedalusConstellation:
         redis_mounts = [constellation.ConstellationMount("daedalus-redis", "/data")]
         redis = constellation.ConstellationContainer("redis", cfg.redis_ref, mounts=redis_mounts)
 
-        # 2. api configure (configures the queue - this only needs to happen on first start.
-        # The entrypoint will fail subsequently, but this doesn't prevent the constellation from running.
-        # This is an ephemeral container which will exit after doing the queue configuration.)
+        # 2. api
         api_env = {"DAEDALUS_QUEUE_ID": cfg.api_queue_id, "REDIS_CONTAINER_NAME": "daedalus-redis"}
-        api_configure = constellation.ConstellationContainer(
-            "api-configure", cfg.api_ref, entrypoint="/usr/local/bin/daedalus.api.configure", environment=api_env
+        api_mounts = [constellation.ConstellationMount("daedalus-model-results", "/daedalus/results")]
+        api = constellation.ConstellationContainer(
+            "api",
+            cfg.api_ref,
+            environment=api_env,
+            mounts=api_mounts,
+            configure=self.api_wait,
+            entrypoint="/usr/local/bin/daedalus.api",
         )
 
         # 3. api workers
-        api_mounts = [constellation.ConstellationMount("daedalus-model-results", "/daedalus/results")]
         api_workers = constellation.ConstellationService(
             "api-worker",
             cfg.api_ref,
@@ -32,12 +35,7 @@ class DaedalusConstellation:
             entrypoint="/usr/local/bin/daedalus.api.worker",
         )
 
-        # 4. api
-        api = constellation.ConstellationContainer(
-            "api", cfg.api_ref, environment=api_env, mounts=api_mounts, entrypoint="/usr/local/bin/daedalus.api"
-        )
-
-        # 5. web_app_db
+        # 4. web_app_db
         db_user = cfg.web_app_db_postgres_user
         db_password = cfg.web_app_db_postgres_password
         web_app_db_env = {
@@ -53,14 +51,14 @@ class DaedalusConstellation:
             mounts=web_app_db_mounts,
         )
 
-        # 6. web_app
+        # 5. web_app
         db_url = (
             f"postgresql://{db_user}:{db_password}@{cfg.web_app_db_ref.name}:{cfg.web_app_db_port}/daedalus-web-app"
         )
         web_app_env = {"DATABASE_URL": db_url, "NUXT_R_API_BASE": f"http://daedalus-api:{cfg.api_port}/"}
         web_app = constellation.ConstellationContainer("web-app", cfg.web_app_ref, environment=web_app_env)
 
-        # 7. proxy
+        # 6. proxy
         proxy_ports = [cfg.proxy_port_http, cfg.proxy_port_https]
         proxy_mounts = [constellation.ConstellationMount("proxy-logs", cfg.proxy_logs_location)]
         daedalus_app_url = f"http://{cfg.container_prefix}-{web_app.name}:{cfg.web_app_port}"
@@ -73,7 +71,7 @@ class DaedalusConstellation:
             args=[cfg.proxy_host, cfg.proxy_ref.name, daedalus_app_url],
         )
 
-        containers = [redis, api_configure, api_workers, api, web_app_db, web_app, proxy]
+        containers = [redis, api, api_workers, web_app_db, web_app, proxy]
 
         obj = constellation.Constellation(
             "daedalus", cfg.container_prefix, containers, cfg.network, cfg.volumes, data=cfg
@@ -87,6 +85,12 @@ class DaedalusConstellation:
     def db_configure(self, container, _):
         print("[web-app-dn] Waiting for db")
         args = ["wait-for-db"]
+        docker_util.exec_safely(container, args)
+
+    def api_wait(self, container, _):
+        # Give the api a couple of seconds to configure the queue
+        print("Waiting for api")
+        args = ["sleep", "2"]
         docker_util.exec_safely(container, args)
 
     def proxy_configure(self, container, cfg):
