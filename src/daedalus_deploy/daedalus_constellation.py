@@ -10,12 +10,12 @@ class DaedalusConstellation:
             vault.resolve_secrets(cfg, cfg.vault.client())
 
         # 1. redis
-        redis_mounts = [constellation.ConstellationMount("daedalus-redis", "/data")]
+        redis_mounts = [constellation.ConstellationVolumeMount("daedalus-redis", "/data")]
         redis = constellation.ConstellationContainer("redis", cfg.redis_ref, mounts=redis_mounts)
 
         # 2. api
         api_env = {"DAEDALUS_QUEUE_ID": cfg.api_queue_id, "REDIS_CONTAINER_NAME": "daedalus-redis"}
-        api_mounts = [constellation.ConstellationMount("daedalus-model-results", "/daedalus/results")]
+        api_mounts = [constellation.ConstellationVolumeMount("daedalus-model-results", "/daedalus/results")]
         api = constellation.ConstellationContainer(
             "api",
             cfg.api_ref,
@@ -42,7 +42,7 @@ class DaedalusConstellation:
             "POSTGRES_USER": db_user,
             "POSTGRES_PASSWORD": db_password,
         }
-        web_app_db_mounts = [constellation.ConstellationMount("daedalus-data", cfg.web_app_db_data_location)]
+        web_app_db_mounts = [constellation.ConstellationVolumeMount("daedalus-data", cfg.web_app_db_data_location)]
         web_app_db = constellation.ConstellationContainer(
             "web-app-db",
             cfg.web_app_db_ref,
@@ -60,7 +60,7 @@ class DaedalusConstellation:
 
         # 6. proxy
         proxy_ports = [cfg.proxy_port_http, cfg.proxy_port_https]
-        proxy_mounts = [constellation.ConstellationMount("proxy-logs", cfg.proxy_logs_location)]
+        proxy_mounts = [constellation.ConstellationVolumeMount("proxy-logs", cfg.proxy_logs_location)]
         daedalus_app_url = f"http://{cfg.container_prefix}-{web_app.name}:{cfg.web_app_port}"
         proxy = constellation.ConstellationContainer(
             "proxy",
