@@ -60,7 +60,7 @@ class DaedalusConstellation:
 
         # 6. acme-buddy
 
-        acme = ConstellationContainer(
+        acme = constellation.ConstellationContainer(
             name="acme-buddy",
             image="ghcr.io/reside-ic/acme-buddy:main",
             ports=[2112],
