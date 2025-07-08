@@ -48,9 +48,12 @@ class DaedalusConfig:
         self.proxy_port_https = config.config_integer(dat, [proxy_key, "port_https"])
         self.proxy_logs_location = config.config_string(dat, [proxy_key, "logs_location"])
 
-        if "ssl" in dat["proxy"]:
-            self.proxy_ssl_certificate = config.config_string(dat, [proxy_key, "ssl", "certificate"])
-            self.proxy_ssl_key = config.config_string(dat, [proxy_key, "ssl", "key"])
+        if "hdb" in dat["proxy"]:
+            hdb_username = config.config_string(dat, [proxy_key, "hdb", "hdb_username"])
+            hdb_password = config.config_string(dat, [proxy_key, "hdb", "hdb_password"])
+            with("hdb-credentials", "w") as out:
+                out.write(f"HDB_ACME_USERNAME={hdb_username}\n")
+                out.write(f"HDB_ACME_PASSWORD={hdb_password}\n")
             self.ssl = True
         else:
             self.ssl = False

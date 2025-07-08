@@ -58,9 +58,36 @@ class DaedalusConstellation:
         web_app_env = {"DATABASE_URL": db_url, "NUXT_R_API_BASE": f"http://daedalus-api:{cfg.api_port}/"}
         web_app = constellation.ConstellationContainer("web-app", cfg.web_app_ref, environment=web_app_env)
 
-        # 6. proxy
+        # 6. acme-buddy
+
+        acme = ConstellationContainer(
+            name="acme-buddy",
+            image="ghcr.io/reside-ic/acme-buddy:main",
+            ports=[2112],
+            restart="unless-stopped",
+            mounts=[
+                constellation.ConstellationVolumeMount(f"{cfg.container_prefix}-tls", "/tls"),
+                constellation.ConstellationVolumeMount(None, "/var/run/docker.sock")
+            ],
+            environment=["ACME_BUDDY_STAGING"],
+            env_files=["hdb-credentials"],
+            args=[
+                "--domain", f"{cfg.server}.dide.ic.ac.uk",
+                "--email", "reside@imperial.ac.uk",
+                "--dns-provider", "hdb",
+                "--certificate-path", "/tls/certificate.pem",
+                "--key-path", "/tls/key.pem",
+                "--account-path", "/tls/account.json",
+                "--reload-container", f"{cfg.container_prefix}-proxy-1"
+            ]
+        )
+
+        # 7. proxy
         proxy_ports = [cfg.proxy_port_http, cfg.proxy_port_https]
-        proxy_mounts = [constellation.ConstellationVolumeMount("proxy-logs", cfg.proxy_logs_location)]
+        proxy_mounts = [
+            constellation.ConstellationVolumeMount("proxy-logs", cfg.proxy_logs_location),
+            constellation.ConstellationVolumeMount("{cfg.container_prefix}-tls", "/run/proxy")
+        ]
         daedalus_app_url = f"http://{cfg.container_prefix}-{web_app.name}:{cfg.web_app_port}"
         proxy = constellation.ConstellationContainer(
             "proxy",
@@ -71,7 +98,7 @@ class DaedalusConstellation:
             args=[cfg.proxy_host, cfg.proxy_ref.name, daedalus_app_url],
         )
 
-        containers = [redis, api, api_workers, web_app_db, web_app, proxy]
+        containers = [redis, api, api_workers, web_app_db, web_app, acme, proxy]
 
         obj = constellation.Constellation(
             "daedalus", cfg.container_prefix, containers, cfg.network, cfg.volumes, data=cfg
@@ -94,11 +121,7 @@ class DaedalusConstellation:
         docker_util.exec_safely(container, args)
 
     def proxy_configure(self, container, cfg):
-        if cfg.ssl:
-            print("Copying ssl certificate and key into proxy")
-            docker_util.string_into_container(cfg.proxy_ssl_certificate, container, "/run/proxy/certificate.pem")
-            docker_util.string_into_container(cfg.proxy_ssl_key, container, "/run/proxy/key.pem")
-        else:
+        if not cfg.ssl:
             print("Generating self-signed certificates for proxy")
             args = [
                 "/usr/local/bin/build-self-signed-certificate",
