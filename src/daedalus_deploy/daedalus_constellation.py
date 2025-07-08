@@ -62,15 +62,16 @@ class DaedalusConstellation:
         acme_env = {"ACME_BUDDY_STAGING": cfg.api_queue_id, 
                     "HDB_ACME_USERNAME": cfg.hdb_username,
                     "HDB_ACME_PASSWORD": cfg.hdb_password}
+        acme_mounts = [
+            constellation.ConstellationVolumeMount(f"{cfg.container_prefix}-tls", "/tls"),
+            constellation.ConstellationVolumeMount(None, "/var/run/docker.sock")
+        ]
 
         acme = constellation.ConstellationContainer(
             name="acme-buddy",
             image="ghcr.io/reside-ic/acme-buddy:main",
             ports=[2112],
-            mounts=[
-                constellation.ConstellationVolumeMount(f"{cfg.container_prefix}-tls", "/tls"),
-                constellation.ConstellationVolumeMount(None, "/var/run/docker.sock")
-            ],
+            mounts=acme_mounts,
             environment=acme_env,
             args=[
                 "--domain", cfg.proxy_host,
