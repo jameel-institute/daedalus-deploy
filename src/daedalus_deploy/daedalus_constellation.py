@@ -59,6 +59,9 @@ class DaedalusConstellation:
         web_app = constellation.ConstellationContainer("web-app", cfg.web_app_ref, environment=web_app_env)
 
         # 6. acme-buddy
+        acme_env = {"ACME_BUDDY_STAGING": cfg.api_queue_id, 
+                    "HDB_ACME_USERNAME": cfg.hdb_username,
+                    "HDB_ACME_PASSWORD": cfg.hdb_password}
 
         acme = constellation.ConstellationContainer(
             name="acme-buddy",
@@ -68,8 +71,7 @@ class DaedalusConstellation:
                 constellation.ConstellationVolumeMount(f"{cfg.container_prefix}-tls", "/tls"),
                 constellation.ConstellationVolumeMount(None, "/var/run/docker.sock")
             ],
-            environment=["ACME_BUDDY_STAGING"],
-            env_files=["hdb-credentials"],
+            environment=acme_env,
             args=[
                 "--domain", cfg.proxy_host,
                 "--email", "reside@imperial.ac.uk",
