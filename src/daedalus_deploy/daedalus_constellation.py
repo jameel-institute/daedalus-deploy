@@ -63,7 +63,7 @@ class DaedalusConstellation:
                     "HDB_ACME_USERNAME": cfg.hdb_username,
                     "HDB_ACME_PASSWORD": cfg.hdb_password}
         acme_mounts = [
-            constellation.ConstellationVolumeMount(f"{cfg.container_prefix}-tls", "/tls"),
+            constellation.ConstellationVolumeMount("daedalus-tls", "/tls"),
             constellation.ConstellationVolumeMount(None, "/var/run/docker.sock")
         ]
 
@@ -88,7 +88,7 @@ class DaedalusConstellation:
         proxy_ports = [cfg.proxy_port_http, cfg.proxy_port_https]
         proxy_mounts = [
             constellation.ConstellationVolumeMount("proxy-logs", cfg.proxy_logs_location),
-            constellation.ConstellationVolumeMount("{cfg.container_prefix}-tls", "/run/proxy")
+            constellation.ConstellationVolumeMount("daedalus-tls", "/run/proxy")
         ]
         daedalus_app_url = f"http://{cfg.container_prefix}-{web_app.name}:{cfg.web_app_port}"
         proxy = constellation.ConstellationContainer(
