@@ -17,7 +17,7 @@ class DaedalusConfig:
             "daedalus-model-results": "daedalus-model-results",
             "daedalus-data": "daedalus-data",
             "proxy-logs": "proxy-logs",
-            "daedalus-tls" : "daedalus-tls",
+            "daedalus-tls": "daedalus-tls",
         }
 
         # redis
