@@ -64,7 +64,6 @@ class DaedalusConstellation:
             name="acme-buddy",
             image="ghcr.io/reside-ic/acme-buddy:main",
             ports=[2112],
-            restart="unless-stopped",
             mounts=[
                 constellation.ConstellationVolumeMount(f"{cfg.container_prefix}-tls", "/tls"),
                 constellation.ConstellationVolumeMount(None, "/var/run/docker.sock")
