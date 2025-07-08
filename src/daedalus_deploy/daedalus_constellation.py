@@ -72,7 +72,7 @@ class DaedalusConstellation:
             environment=["ACME_BUDDY_STAGING"],
             env_files=["hdb-credentials"],
             args=[
-                "--domain", f"{cfg.server}.dide.ic.ac.uk",
+                "--domain", cfg.proxy_host,
                 "--email", "reside@imperial.ac.uk",
                 "--dns-provider", "hdb",
                 "--certificate-path", "/tls/certificate.pem",
