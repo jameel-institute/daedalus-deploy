@@ -64,7 +64,7 @@ class DaedalusConstellation:
                     "HDB_ACME_PASSWORD": cfg.hdb_password}
         acme_mounts = [
             constellation.ConstellationVolumeMount("daedalus-tls", "/tls"),
-            constellation.ConstellationVolumeMount("/var/run.docker.sock", "/var/run/docker.sock")
+            constellation.ConstellationBindMount("/var/run/docker.sock", "/var/run/docker.sock")
         ]
 
         acme = constellation.ConstellationContainer(
