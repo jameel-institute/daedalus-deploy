@@ -54,6 +54,8 @@ class DaedalusConfig:
             self.hdb_password = config.config_string(dat, [proxy_key, "hdb", "hdb_password"])
             self.ssl = True
         else:
+            self.hdb_username = ""
+            self.hdb_password = ""
             self.ssl = False
 
     def get_image_reference(self, config_section, dat):
