@@ -51,7 +51,7 @@ class DaedalusConfig:
         if "hdb" in dat["proxy"]:
             hdb_username = config.config_string(dat, [proxy_key, "hdb", "hdb_username"])
             hdb_password = config.config_string(dat, [proxy_key, "hdb", "hdb_password"])
-            with("hdb-credentials", "w") as out:
+            with open("hdb-credentials", "w") as out:
                 out.write(f"HDB_ACME_USERNAME={hdb_username}\n")
                 out.write(f"HDB_ACME_PASSWORD={hdb_password}\n")
             self.ssl = True
