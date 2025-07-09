@@ -60,7 +60,7 @@ class DaedalusConfig:
             
         #acme
         acme_key = "acme_buddy"
-        self.acme_ref = self.get_image_reference(acme_key, dat)
+        self.acme_buddy_ref = self.get_image_reference(acme_key, dat)
         self.acme_buddy_port = config.config_integer(dat, [acme_key, "port"])
 
     def get_image_reference(self, config_section, dat):
