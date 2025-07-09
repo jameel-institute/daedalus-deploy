@@ -91,7 +91,7 @@ class DaedalusConstellation:
 
         acme = constellation.ConstellationContainer(
             "acme-buddy",
-            cfg.acme_budy_ref,
+            cfg.acme_buddy_ref,
             ports=cfg.acme_buddy_port,
             mounts=acme_mounts,
             environment=acme_env,
