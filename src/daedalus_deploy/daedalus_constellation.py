@@ -60,44 +60,7 @@ class DaedalusConstellation:
         web_app_env = {"DATABASE_URL": db_url, "NUXT_R_API_BASE": f"http://daedalus-api:{cfg.api_port}/"}
         web_app = constellation.ConstellationContainer("web-app", cfg.web_app_ref, environment=web_app_env)
 
-        # 6. acme-buddy
-
-        acme_buddy_staging = os.environ.get("ACME_BUDDY_STAGING", 0)
-        acme_env = {
-            "ACME_BUDDY_STAGING": acme_buddy_staging,
-            "HDB_ACME_USERNAME": cfg.hdb_username,
-            "HDB_ACME_PASSWORD": cfg.hdb_password,
-        }
-        acme_mounts = [
-            constellation.ConstellationVolumeMount("daedalus-tls", "/tls"),
-            constellation.ConstellationBindMount("/var/run/docker.sock", "/var/run/docker.sock"),
-        ]
-
-        acme = constellation.ConstellationContainer(
-            name="acme-buddy",
-            image="ghcr.io/reside-ic/acme-buddy:main",
-            ports=[2112],
-            mounts=acme_mounts,
-            environment=acme_env,
-            args=[
-                "--domain",
-                cfg.proxy_host,
-                "--email",
-                "reside@imperial.ac.uk",
-                "--dns-provider",
-                "hdb",
-                "--certificate-path",
-                "/tls/certificate.pem",
-                "--key-path",
-                "/tls/key.pem",
-                "--account-path",
-                "/tls/account.json",
-                "--reload-container",
-                f"{cfg.container_prefix}-proxy-1",
-            ],
-        )
-
-        # 7. proxy
+        # 6. proxy
         proxy_ports = [cfg.proxy_port_http, cfg.proxy_port_https]
         proxy_mounts = [
             constellation.ConstellationVolumeMount("proxy-logs", cfg.proxy_logs_location),
@@ -113,7 +76,35 @@ class DaedalusConstellation:
             args=[cfg.proxy_host, cfg.proxy_ref.name, daedalus_app_url],
         )
 
-        containers = [redis, api, api_workers, web_app_db, web_app, acme, proxy]
+        # 7. acme-buddy
+
+        acme_buddy_staging = os.environ.get('ACME_BUDDY_STAGING', 0)
+        acme_env = {"ACME_BUDDY_STAGING": acme_buddy_staging,
+                    "HDB_ACME_USERNAME": cfg.hdb_username,
+                    "HDB_ACME_PASSWORD": cfg.hdb_password}
+        acme_mounts = [
+            constellation.ConstellationVolumeMount("daedalus-tls", "/tls"),
+            constellation.ConstellationBindMount("/var/run/docker.sock", "/var/run/docker.sock")
+        ]
+
+        acme = constellation.ConstellationContainer(
+            "acme-buddy",
+            cfg.acme_budy_ref,
+            ports=cfg.acme_buddy_port,
+            mounts=acme_mounts,
+            environment=acme_env,
+            args=[
+                "--domain", cfg.proxy_host,
+                "--email", "reside@imperial.ac.uk",
+                "--dns-provider", "hdb",
+                "--certificate-path", "/tls/certificate.pem",
+                "--key-path", "/tls/key.pem",
+                "--account-path", "/tls/account.json",
+                "--reload-container", proxy.name_external(cfg.container_prefix)"
+            ]
+        )
+
+        containers = [redis, api, api_workers, web_app_db, web_app, proxy, acme]
 
         obj = constellation.Constellation(
             "daedalus", cfg.container_prefix, containers, cfg.network, cfg.volumes, data=cfg

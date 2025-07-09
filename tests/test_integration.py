@@ -22,6 +22,7 @@ def test_start_daedalus():
     assert docker_util.container_exists("daedalus-web-app-db")
     assert docker_util.container_exists("daedalus-web-app")
     assert docker_util.container_exists("daedalus-proxy")
+    assert docker_util.container_exists("daedalus-acme-buddy")
 
     constellation.obj.destroy()
 
@@ -36,3 +37,4 @@ def test_start_daedalus():
     assert not docker_util.container_exists("daedalus-web-app-db")
     assert not docker_util.container_exists("daedalus-web-app")
     assert not docker_util.container_exists("daedalus-proxy")
+    assert not docker_util.container_exists("daedalus-acme-buddy")

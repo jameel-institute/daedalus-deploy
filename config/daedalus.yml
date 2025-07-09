@@ -37,3 +37,9 @@ web_app:
     name: daedalus-web-app
     tag: main
   port: 3000
+acme_buddy:
+  image:
+    repo: ghcr.io/reside-ic
+    name: acme-buddy
+    tag: main
+  port: 2112
