@@ -78,13 +78,15 @@ class DaedalusConstellation:
 
         # 7. acme-buddy
 
-        acme_buddy_staging = os.environ.get('ACME_BUDDY_STAGING', 0)
-        acme_env = {"ACME_BUDDY_STAGING": acme_buddy_staging,
-                    "HDB_ACME_USERNAME": cfg.hdb_username,
-                    "HDB_ACME_PASSWORD": cfg.hdb_password}
+        acme_buddy_staging = os.environ.get("ACME_BUDDY_STAGING", 0)
+        acme_env = {
+            "ACME_BUDDY_STAGING": acme_buddy_staging,
+            "HDB_ACME_USERNAME": cfg.hdb_username,
+            "HDB_ACME_PASSWORD": cfg.hdb_password,
+        }
         acme_mounts = [
             constellation.ConstellationVolumeMount("daedalus-tls", "/tls"),
-            constellation.ConstellationBindMount("/var/run/docker.sock", "/var/run/docker.sock")
+            constellation.ConstellationBindMount("/var/run/docker.sock", "/var/run/docker.sock"),
         ]
 
         acme = constellation.ConstellationContainer(
@@ -94,14 +96,21 @@ class DaedalusConstellation:
             mounts=acme_mounts,
             environment=acme_env,
             args=[
-                "--domain", cfg.proxy_host,
-                "--email", "reside@imperial.ac.uk",
-                "--dns-provider", "hdb",
-                "--certificate-path", "/tls/certificate.pem",
-                "--key-path", "/tls/key.pem",
-                "--account-path", "/tls/account.json",
-                "--reload-container", proxy.name_external(cfg.container_prefix)"
-            ]
+                "--domain",
+                cfg.proxy_host,
+                "--email",
+                "reside@imperial.ac.uk",
+                "--dns-provider",
+                "hdb",
+                "--certificate-path",
+                "/tls/certificate.pem",
+                "--key-path",
+                "/tls/key.pem",
+                "--account-path",
+                "/tls/account.json",
+                "--reload-container",
+                proxy.name_external(cfg.container_prefix),
+            ],
         )
 
         containers = [redis, api, api_workers, web_app_db, web_app, proxy, acme]
