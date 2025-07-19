@@ -51,15 +51,7 @@ Run linting with automatic fixes with `hatch fmt`. To check linting only, with n
 
 ## Using Let's Encrypt
 
-At first, we acquired SSL certificates for `daedalus-dev.dide.ic.ac.uk` and
-`*.jameel-institute.org` and put them in  the vault. They would be retrieves and
-copied into `/run/proxy` in the proxy container on deployment.
-
-Because of changes in the lifetime of these kind of certificates, in
-[this PR](https://github.com/jameel-institute/daedalus-deploy/pull/9)
-we moved to [Let's Encrypt](https://letsencrypt.org)
-
-We now mount a shared volume (`daedalus-tls`) into the proxy, and a long-running
+We mount a shared volume (`daedalus-tls`) into the proxy, and a long-running
 process, [acme-buddy](https://github.com/reside-ic/acme-buddy), is our ACME client
 that talks to Let's Encrypt and requests a new certificate a while before expiry.
 It then writes that into the `daedalus-tls` volume, and sends a signal to the
