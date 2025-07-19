@@ -48,7 +48,7 @@ class DaedalusConfig:
         self.proxy_port_http = config.config_integer(dat, [proxy_key, "port_http"])
         self.proxy_port_https = config.config_integer(dat, [proxy_key, "port_https"])
         self.proxy_logs_location = config.config_string(dat, [proxy_key, "logs_location"])
-        self.ssl = not self.proxy_host == "localhost"
+        self.ssl = self.proxy_host != "localhost"
 
         # acme
         acme_key = "acme_buddy"
