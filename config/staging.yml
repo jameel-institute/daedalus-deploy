@@ -1,8 +1,5 @@
 proxy:
   host: daedalus-dev.dide.ic.ac.uk
-  hdb:
-    hdb_username: VAULT:secret/certbot-hdb/credentials:username
-    hdb_password: VAULT:secret/certbot-hdb/credentials:password
 web_app_db:
   postgres:
     user: VAULT:secret/daedalus/postgres/dev:user

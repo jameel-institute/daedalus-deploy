@@ -81,8 +81,8 @@ class DaedalusConstellation:
         acme_buddy_staging = os.environ.get("ACME_BUDDY_STAGING", 0)
         acme_env = {
             "ACME_BUDDY_STAGING": acme_buddy_staging,
-            "HDB_ACME_USERNAME": cfg.hdb_username,
-            "HDB_ACME_PASSWORD": cfg.hdb_password,
+            "HDB_ACME_USERNAME": acme_buddy_hdb_username,
+            "HDB_ACME_PASSWORD": acme_buddy_hdb_password,
         }
         acme_mounts = [
             constellation.ConstellationVolumeMount("daedalus-tls", "/tls"),

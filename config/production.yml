@@ -1,8 +1,5 @@
 proxy:
   host: daedalus.jameel-institute.org
-  hdb:
-    hdb_username: VAULT:secret/certbot-hdb/credentials:username
-    hdb_password: VAULT:secret/certbot-hdb/credentials:password
 api:
   number_of_workers: 4
 web_app_db:
