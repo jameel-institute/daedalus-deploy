@@ -42,6 +42,6 @@ acme_buddy:
     repo: ghcr.io/reside-ic
     name: acme-buddy
     tag: main
-    hdb_username: VAULT:secret/certbot-hdb/credentials:username
-    hdb_password: VAULT:secret/certbot-hdb/credentials:password
+  hdb_username: VAULT:secret/certbot-hdb/credentials:username
+  hdb_password: VAULT:secret/certbot-hdb/credentials:password
   port: 2112
