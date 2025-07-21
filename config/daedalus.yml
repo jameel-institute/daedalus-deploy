@@ -37,11 +37,3 @@ web_app:
     name: daedalus-web-app
     tag: main
   port: 3000
-acme_buddy:
-  image:
-    repo: ghcr.io/reside-ic
-    name: acme-buddy
-    tag: main
-  hdb_username: VAULT:secret/certbot-hdb/credentials:username
-  hdb_password: VAULT:secret/certbot-hdb/credentials:password
-  port: 2112
