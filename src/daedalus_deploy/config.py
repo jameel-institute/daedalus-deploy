@@ -52,10 +52,13 @@ class DaedalusConfig:
 
         # acme
         acme_key = "acme_buddy"
-        self.acme_buddy_ref = self.get_image_reference(acme_key, dat)
-        self.acme_buddy_port = config.config_integer(dat, [acme_key, "port"])
-        self.acme_buddy_hdb_username = config.config_string(dat, [acme_key, "hdb_username"])
-        self.acme_buddy_hdb_password = config.config_string(dat, [acme_key, "hdb_password"])
+        self.use_acme = acme_key in dat
+        if self.use_acme:
+            self.use_acme = True
+            self.acme_buddy_ref = self.get_image_reference(acme_key, dat)
+            self.acme_buddy_port = config.config_integer(dat, [acme_key, "port"])
+            self.acme_buddy_hdb_username = config.config_string(dat, [acme_key, "hdb_username"])
+            self.acme_buddy_hdb_password = config.config_string(dat, [acme_key, "hdb_password"])
 
     def get_image_reference(self, config_section, dat):
         repo = config.config_string(dat, [config_section, "image", "repo"])
