@@ -17,6 +17,7 @@ class DaedalusConfig:
             "daedalus-model-results": "daedalus-model-results",
             "daedalus-data": "daedalus-data",
             "proxy-logs": "proxy-logs",
+            "daedalus-tls": "daedalus-tls",
         }
 
         # redis
@@ -47,13 +48,16 @@ class DaedalusConfig:
         self.proxy_port_http = config.config_integer(dat, [proxy_key, "port_http"])
         self.proxy_port_https = config.config_integer(dat, [proxy_key, "port_https"])
         self.proxy_logs_location = config.config_string(dat, [proxy_key, "logs_location"])
+        self.ssl = self.proxy_host != "localhost"
 
-        if "ssl" in dat["proxy"]:
-            self.proxy_ssl_certificate = config.config_string(dat, [proxy_key, "ssl", "certificate"])
-            self.proxy_ssl_key = config.config_string(dat, [proxy_key, "ssl", "key"])
-            self.ssl = True
-        else:
-            self.ssl = False
+        # acme
+        acme_key = "acme_buddy"
+        self.use_acme = acme_key in dat
+        if self.use_acme:
+            self.acme_buddy_ref = self.get_image_reference(acme_key, dat)
+            self.acme_buddy_port = config.config_integer(dat, [acme_key, "port"])
+            self.acme_buddy_hdb_username = config.config_string(dat, [acme_key, "hdb_username"])
+            self.acme_buddy_hdb_password = config.config_string(dat, [acme_key, "hdb_password"])
 
     def get_image_reference(self, config_section, dat):
         repo = config.config_string(dat, [config_section, "image", "repo"])

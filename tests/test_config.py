@@ -17,6 +17,7 @@ def test_base_config(cfg):
     assert cfg.volumes["daedalus-model-results"] == "daedalus-model-results"
     assert cfg.volumes["daedalus-data"] == "daedalus-data"
     assert cfg.volumes["proxy-logs"] == "proxy-logs"
+    assert cfg.volumes["daedalus-tls"] == "daedalus-tls"
 
 
 def test_redis(cfg):

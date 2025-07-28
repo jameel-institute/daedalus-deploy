@@ -1,8 +1,5 @@
 proxy:
   host: daedalus.jameel-institute.org
-  ssl:
-    certificate: VAULT:secret/daedalus/ssl/jameel_institute_org/cert:value
-    key: VAULT:secret/daedalus/ssl/jameel_institute_org/key:value
 api:
   number_of_workers: 4
 web_app_db:
@@ -13,3 +10,11 @@ vault:
   addr: https://vault.dide.ic.ac.uk:8200
   auth:
     method: github
+acme_buddy:
+  image:
+    repo: ghcr.io/reside-ic
+    name: acme-buddy
+    tag: main
+  hdb_username: VAULT:secret/certbot-hdb/credentials:username
+  hdb_password: VAULT:secret/certbot-hdb/credentials:password
+  port: 2112
