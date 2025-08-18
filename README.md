@@ -5,6 +5,7 @@ Deploy tool for the Daedalus app
 
 1. [Python3](https://www.python.org/downloads/) (>= 3.10)
 2. [Hatch](https://hatch.pypa.io/latest/install/)
+3. [Vault credentials](https://mrc-ide.myjetbrains.com/youtrack/articles/RESIDE-A-18/Vault)
 
 ## Installation
 
