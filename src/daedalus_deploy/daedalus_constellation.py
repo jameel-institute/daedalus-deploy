@@ -89,6 +89,10 @@ class DaedalusConstellation:
                 constellation.ConstellationBindMount("/var/run/docker.sock", "/var/run/docker.sock"),
             ]
 
+            domain_names= cfg.proxy_host
+            if cfg.proxy_host_alias:
+                domain_names += f",{cfg.proxy_host_alias}"
+
             acme = constellation.ConstellationContainer(
                 "acme-buddy",
                 cfg.acme_buddy_ref,
@@ -97,7 +101,7 @@ class DaedalusConstellation:
                 environment=acme_env,
                 args=[
                     "--domain",
-                    cfg.proxy_host,
+                    domain_names,
                     "--email",
                     "reside@imperial.ac.uk",
                     "--dns-provider",

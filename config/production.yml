@@ -1,5 +1,6 @@
 proxy:
   host: daedalus.jameel-institute.org
+  host_alias: daedalus.dide.ic.ac.uk
 api:
   number_of_workers: 4
 web_app_db:
