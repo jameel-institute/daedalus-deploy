@@ -89,7 +89,7 @@ class DaedalusConstellation:
                 constellation.ConstellationBindMount("/var/run/docker.sock", "/var/run/docker.sock"),
             ]
 
-            domain_names= cfg.proxy_host
+            domain_names = cfg.proxy_host
             if cfg.proxy_host_alias:
                 domain_names += f",{cfg.proxy_host_alias}"
 
