@@ -1,7 +1,7 @@
 proxy:
   host: daedalus.jameel-institute.org
 api:
-  number_of_workers: 4
+  number_of_workers: 8
 web_app_db:
   postgres:
     user: VAULT:secret/daedalus/postgres/dev:user
