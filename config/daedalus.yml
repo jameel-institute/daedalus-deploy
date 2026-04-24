@@ -16,9 +16,9 @@ redis:
     tag: latest
 api:
   image:
-    repo: mrcide
+    repo: ghcr.io/jameel-institute
     name: daedalus.api
-    tag: latest
+    tag: ghcr # Change target branch 'ghcr' to 'latest' once https://github.com/jameel-institute/daedalus.api/pull/56 is merged
   port: 8001
   queue_id: daedalus-queue
   number_of_workers: 1

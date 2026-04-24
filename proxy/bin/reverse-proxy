@@ -7,7 +7,7 @@ if [ "$#" -eq 3 ]; then
     export DAEDALUS_APP=$3
 else
     echo "Usage: <hostname> <servername> <daedalusapp>"
-    echo "e.g. docker run ... mrcide/daedalus-proxy:main localhost daedalus-proxy http://daedalus-web-app:3000"
+    echo "e.g. docker run ... ghcr.io/jameel-institute/daedalus-proxy:main localhost daedalus-proxy http://daedalus-web-app:3000"
     exit 1
 fi
 
