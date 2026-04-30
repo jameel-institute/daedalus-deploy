@@ -73,5 +73,6 @@ exclude_lines = [
 ignore = [
   "T201", # allow print
   "S301", # allow pickle
-  "TRY002" # allow Exception
+  "TRY002", # allow Exception
+  "PLW1508", # allow environment variable to be set to 0
 ]

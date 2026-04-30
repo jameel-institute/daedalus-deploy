@@ -28,7 +28,7 @@ def test_redis(cfg):
 def test_api(cfg):
     assert cfg.api_queue_id == "daedalus-queue"
     assert cfg.api_number_of_workers == 1
-    assert cfg.api_ref.repo == "mrcide"
+    assert cfg.api_ref.repo == "ghcr.io/jameel-institute"
     assert cfg.api_ref.name == "daedalus.api"
     assert cfg.api_port == 8001
 

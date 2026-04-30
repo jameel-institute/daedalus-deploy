@@ -16,7 +16,7 @@ redis:
     tag: latest
 api:
   image:
-    repo: mrcide
+    repo: ghcr.io/jameel-institute
     name: daedalus.api
     tag: latest
   port: 8001
