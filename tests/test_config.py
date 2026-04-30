@@ -52,6 +52,7 @@ def test_proxy(cfg):
     assert cfg.proxy_ref.repo == "ghcr.io/jameel-institute"
     assert cfg.proxy_ref.name == "daedalus-proxy"
     assert cfg.proxy_host == "localhost"
+    assert cfg.proxy_host_alias == "test.dide.local"
     assert cfg.proxy_port_http == 80
     assert cfg.proxy_port_https == 443
     assert cfg.proxy_logs_location == "/var/log/nginx"

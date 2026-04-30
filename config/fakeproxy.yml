@@ -1,5 +1,6 @@
 proxy:
   host: localhost
+  host_alias: test.dide.local
 web_app_db:
   postgres:
     password: changeme

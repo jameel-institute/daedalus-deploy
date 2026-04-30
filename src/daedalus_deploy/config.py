@@ -45,6 +45,7 @@ class DaedalusConfig:
         proxy_key = "proxy"
         self.proxy_ref = self.get_image_reference(proxy_key, dat)
         self.proxy_host = config.config_string(dat, [proxy_key, "host"])
+        self.proxy_host_alias = config.config_string(dat, [proxy_key, "host_alias"], is_optional=True)
         self.proxy_port_http = config.config_integer(dat, [proxy_key, "port_http"])
         self.proxy_port_https = config.config_integer(dat, [proxy_key, "port_https"])
         self.proxy_logs_location = config.config_string(dat, [proxy_key, "logs_location"])
