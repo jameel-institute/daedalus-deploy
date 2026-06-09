@@ -127,7 +127,7 @@ class DaedalusConstellation:
 
         print("grafana_alloy_config_path", self.cfg.grafana_alloy_config_path)
 
-        # Equivalent to https://grafana.com/docs/alloy/latest/set-up/install/docker/
+        # Equivalent to https://grafana.com/docs/alloy/latest/set-up/install/docker/ linux setup.
         # I will eventually translate this into constellation commands
         # Alternatively, have a separate deploy tool for alloy if it will be similar enough across different projects.
         client = docker.client.from_env()
@@ -143,6 +143,10 @@ class DaedalusConstellation:
                 self.cfg.grafana_alloy_config_path: {
                     "bind": "/etc/alloy/config.alloy",
                     "mode": "ro", # read-only, different from default read-write, so that config always comes from github repo
+                },
+                "/var/run/docker.sock": {
+                    "bind": "/var/run/docker.sock",
+                    "mode": "ro",
                 },
             },
             ports={"12345": 12345},
