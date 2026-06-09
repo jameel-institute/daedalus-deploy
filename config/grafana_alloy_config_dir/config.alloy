@@ -1,0 +1,97 @@
+// This configuration file can be viewed visually via the Alloy UI at http://localhost:12345/graph.
+
+
+
+// From https://grafana.com/docs/alloy/latest/set-up/install/docker/
+// I'm guessing this configures Alloy's own logging, not anything else's logging
+logging {
+  level  = "info"
+  format = "logfmt"
+}
+
+
+// The below come from https://github.com/grafana/loki-fundamentals/blob/getting-started/config.alloy
+// which is described at https://grafana.com/docs/enterprise-logs/latest/get-started/quick-start/tutorial/#a-look-under-the-hood
+// See also: https://grafana.com/docs/alloy/latest/monitor/monitor-docker-containers/#configure-logging
+
+// can rename "getting_started" to "containers" following https://grafana.com/docs/agent/latest/flow/reference/components/discovery.docker/#examples ;
+// maybe find and replace is correct, or maybe each component should have diff name: check convention.
+
+// This component is responsible for disovering new containers within the docker environment
+// This component queries the metadata of the Docker environment via the Docker socket and discovers new containers, as well as providing metadata about the containers.
+discovery.docker "getting_started" {
+	host = "unix:///var/run/docker.sock" // presumably this fails because alloy is checking inside its own container, not on the host. OK yes, that was indeed the problem, and the solution was a bind-mount.
+	refresh_interval = "5s" // Reduce intervals (plural) for production cases because the logs will fill up fast if they are populated every 5s - see http://localhost:12345/debug/discovery.docker.getting_started
+}
+
+// This component is responsible for relabeling the discovered containers
+// This component converts a metadata (__meta_docker_container_name) label into a Loki label (container).
+// DM: I think this will add an indexed tag ('label') of 'container=[NAME]' to all logs.
+discovery.relabel "getting_started" { // Example name: "logs_integrations_docker" per https://github.com/grafana/alloy-scenarios/blob/main/docker-monitoring/config.alloy
+	targets = []
+
+	rule {
+		source_labels = ["__meta_docker_container_name"]
+		regex         = "/(.*)"
+		target_label  = "container"
+	}
+
+  // Copied from https://github.com/grafana/alloy-scenarios/blob/main/docker-monitoring/config.alloy
+  // See https://grafana.com/docs/alloy/latest/reference/stdlib/constants/
+  // Is not a mapping from one label to another: just adds a label.
+  // constants.hostname ought to work, but since we're running Alloy in a container, it just gives the container ID. So we could pass in something like 'instance_name' as an environment variable when the docker container is started up.
+  rule {
+    target_label = "instance"
+    // replacement  = constants.hostname
+    replacement = sys.env("INSTANCE_HOSTNAME") // I set this in daedalus_constellation.py
+  }
+}
+
+// Confusion: why do we have loki config inside an alloy config file and on the alloy machine?
+
+// This component is responsible for collecting logs from the discovered containers
+// This component collects logs from the discovered containers and forwards them to the next component.
+// It requests the metadata from the discovery.docker component and applies the relabeling rules from the discovery.relabel component.
+loki.source.docker "getting_started" { // Example name: "default" per https://github.com/grafana/alloy-scenarios/blob/main/docker-monitoring/config.alloy
+	host             = "unix:///var/run/docker.sock"
+	targets          = discovery.docker.getting_started.targets
+	forward_to       = [loki.process.getting_started.receiver]
+	relabel_rules    = discovery.relabel.getting_started.rules
+	refresh_interval = "5s"
+}
+
+// This component is responsible for processing the logs (In this case adding static labels)
+// This component provides stages for log transformation and extraction. In this case it adds a static label env=production to all logs.
+loki.process "getting_started" { // Can be renamed 'process_logs' per https://grafana.com/docs/grafana-cloud/send-data/alloy/tutorials/processing-logs/#configure-the-lokiprocess-and-lokiwrite-components
+// or 'docker_logs' per https://github.com/grafana/alloy-scenarios/blob/main/docker-monitoring/config.alloy
+    stage.static_labels {
+        values = {
+          env = "production", // todo: change this to vary env, AND/OR label logs with host name e.g. 'daedalus-dev' and/or the daedalus-deploy config.
+        }
+    }
+    forward_to = [loki.write.getting_started.receiver]
+}
+
+// This component is responsible for writing the logs to Loki
+// This component writes the logs to Loki. It forwards the logs to the Loki endpoint http://loki:3100/loki/api/v1/push.
+loki.write "getting_started" {
+	endpoint {
+		url  = "http://loki:3100/loki/api/v1/push"
+	}
+
+  // Example auth. See https://grafana.com/docs/alloy/latest/reference/components/loki/loki.write/ for options
+  // basic_auth {
+  //  username = "admin"
+  //  password = "admin"
+  // }
+}
+
+// Grafana Alloy provides a built-in real time log viewer.
+// This allows you to view current log entries and how they are being transformed via specific components of the pipeline.
+// To view live debugging mode open a browser tab and navigate to: http://localhost:12345/debug/loki.process.getting_started.
+
+
+// Enables the ability to view logs in the Alloy UI in realtime
+livedebugging {
+  enabled = true
+}

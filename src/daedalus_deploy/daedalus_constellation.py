@@ -125,7 +125,7 @@ class DaedalusConstellation:
     def start(self, args):
         self.obj.start(**args)
 
-        print("grafana_alloy_config_path", self.cfg.grafana_alloy_config_path)
+        print("proxy host", self.cfg.proxy_host)
 
         # Equivalent to https://grafana.com/docs/alloy/latest/set-up/install/docker/ linux setup.
         # I will eventually translate this into constellation commands
@@ -149,12 +149,17 @@ class DaedalusConstellation:
                     "mode": "ro",
                 },
             },
-            ports={"12345": 12345},
+            ports={"12345": 12345}, # NB this exposes the Alloy debugging UI outside the local network (1) https://grafana.com/docs/alloy/latest/configure/linux/#expose-the-ui-to-other-machines (2) https://grafana.com/docs/alloy/latest/troubleshoot/debug/#alloy-ui
+            # I wonder if, if I find out the IP of daedalus-dev, I can request like [ip address]:12345 and find the UI
+            # TODO: If I comment out the above line, then in local dev I don't get any Alloy UI at all. Check if this UI is exposed on prod-like instances and configure it not to be if it is. Hopefully nginx will just not expose it.
             detach=True,
             name=f"{self.cfg.container_prefix}-grafana-alloy",
+            # To tell config.alloy what instance we are reporting from
+            environment={"INSTANCE_HOSTNAME": self.cfg.proxy_host},
         )
 
         # todo: consider adapting to make storage path another volume that persists across container removals/restarts, see https://claude.ai/chat/3468da8e-f37a-4fee-8d04-65096e150176
+        # related: https://grafana.com/docs/alloy/latest/introduction/requirements/#data-durability but note what Claude said which implies storage.path flag is not enough as it will be wiped when alloy container is stopped.
 
 
     def db_configure(self, container, _):
