@@ -125,8 +125,6 @@ class DaedalusConstellation:
     def start(self, args):
         self.obj.start(**args)
 
-        print("proxy host", self.cfg.proxy_host)
-
         # Equivalent to https://grafana.com/docs/alloy/latest/set-up/install/docker/ linux setup.
         # I will eventually translate this into constellation commands
         # Alternatively, have a separate deploy tool for alloy if it will be similar enough across different projects.
@@ -154,8 +152,10 @@ class DaedalusConstellation:
             # TODO: If I comment out the above line, then in local dev I don't get any Alloy UI at all. Check if this UI is exposed on prod-like instances and configure it not to be if it is. Hopefully nginx will just not expose it.
             detach=True,
             name=f"{self.cfg.container_prefix}-grafana-alloy",
-            # To tell config.alloy what instance we are reporting from
-            environment={"INSTANCE_HOSTNAME": self.cfg.proxy_host},
+            environment={
+                "INSTANCE_HOSTNAME": self.cfg.proxy_host, # To tell config.alloy what instance we are reporting from
+                "CONTAINER_PREFIX": self.cfg.container_prefix # To help Alloy exclude irrelevant containers when running daedalus-deploy locally (may be alongside montagu-monitor for example, which we don't want to report)
+            },
         )
 
         # todo: consider adapting to make storage path another volume that persists across container removals/restarts, see https://claude.ai/chat/3468da8e-f37a-4fee-8d04-65096e150176

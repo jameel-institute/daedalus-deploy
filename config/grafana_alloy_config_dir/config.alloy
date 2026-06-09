@@ -25,15 +25,15 @@ discovery.docker "getting_started" {
 }
 
 // This component is responsible for relabeling the discovered containers
-// This component converts a metadata (__meta_docker_container_name) label into a Loki label (container).
-// DM: I think this will add an indexed tag ('label') of 'container=[NAME]' to all logs.
+// This component converts a metadata (__meta_docker_container_name) label into a Loki label (container_name).
+// DM: I think this will add an indexed tag ('label') of 'container_name=[NAME]' to all logs.
 discovery.relabel "getting_started" { // Example name: "logs_integrations_docker" per https://github.com/grafana/alloy-scenarios/blob/main/docker-monitoring/config.alloy
 	targets = []
 
 	rule {
 		source_labels = ["__meta_docker_container_name"]
 		regex         = "/(.*)"
-		target_label  = "container"
+		target_label  = "container_name"
 	}
 
   // Copied from https://github.com/grafana/alloy-scenarios/blob/main/docker-monitoring/config.alloy
@@ -41,7 +41,7 @@ discovery.relabel "getting_started" { // Example name: "logs_integrations_docker
   // Is not a mapping from one label to another: just adds a label.
   // constants.hostname ought to work, but since we're running Alloy in a container, it just gives the container ID. So we could pass in something like 'instance_name' as an environment variable when the docker container is started up.
   rule {
-    target_label = "instance"
+    target_label = "instance_hostname"
     // replacement  = constants.hostname
     replacement = sys.env("INSTANCE_HOSTNAME") // I set this in daedalus_constellation.py
   }
@@ -64,12 +64,23 @@ loki.source.docker "getting_started" { // Example name: "default" per https://gi
 // This component provides stages for log transformation and extraction. In this case it adds a static label env=production to all logs.
 loki.process "getting_started" { // Can be renamed 'process_logs' per https://grafana.com/docs/grafana-cloud/send-data/alloy/tutorials/processing-logs/#configure-the-lokiprocess-and-lokiwrite-components
 // or 'docker_logs' per https://github.com/grafana/alloy-scenarios/blob/main/docker-monitoring/config.alloy
-    stage.static_labels {
-        values = {
-          env = "production", // todo: change this to vary env, AND/OR label logs with host name e.g. 'daedalus-dev' and/or the daedalus-deploy config.
-        }
+  // Drop logs from containers whose name doesn't start with the prefix e.g. keep 'daedalus-redis' but drop 'other'
+  stage.match {
+    selector = string.format(
+      `{container_name!~"%s.*"}`, // "!~" means "does not match regex"
+      string.replace(sys.env("CONTAINER_PREFIX"), ".", `\.`), // Escape any potential periods in container prefix for regex parsing
+    )
+    action = "drop"
+  }
+
+  // TODO: try out: https://grafana.com/docs/alloy/latest/reference/components/loki/loki.process/#stagedocker
+
+  stage.static_labels {
+    values = {
+      env = "production", // todo: change this to vary env, AND/OR label logs with host name e.g. 'daedalus-dev' and/or the daedalus-deploy config.
     }
-    forward_to = [loki.write.getting_started.receiver]
+  }
+  forward_to = [loki.write.getting_started.receiver]
 }
 
 // This component is responsible for writing the logs to Loki
@@ -81,8 +92,8 @@ loki.write "getting_started" {
 
   // Example auth. See https://grafana.com/docs/alloy/latest/reference/components/loki/loki.write/ for options
   // basic_auth {
-  //  username = "admin"
-  //  password = "admin"
+  //  username = "admin" // username = sys.env("LOKI_USERNAME")
+  //  password = "admin" // password = sys.env("GRAFANA_CLOUD_API_KEY")
   // }
 }
 
