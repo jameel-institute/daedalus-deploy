@@ -3,6 +3,7 @@ import os
 import constellation
 from constellation import docker_util, vault
 
+import docker
 
 class DaedalusConstellation:
     def __init__(self, cfg, use_vault):
@@ -123,6 +124,34 @@ class DaedalusConstellation:
 
     def start(self, args):
         self.obj.start(**args)
+
+        print("grafana_alloy_config_path", self.cfg.grafana_alloy_config_path)
+
+        # Equivalent to https://grafana.com/docs/alloy/latest/set-up/install/docker/
+        # I will eventually translate this into constellation commands
+        # Alternatively, have a separate deploy tool for alloy if it will be similar enough across different projects.
+        client = docker.client.from_env()
+        alloy_container = client.containers.run(
+            "grafana/alloy:latest",
+            command=[
+                "run",
+                "--server.http.listen-addr=0.0.0.0:12345",
+                "--storage.path=/var/lib/alloy/data",
+                "/etc/alloy/config.alloy",
+            ],
+            volumes={ # = -v <CONFIG_FILE_PATH>:/etc/alloy/config.alloy
+                self.cfg.grafana_alloy_config_path: {
+                    "bind": "/etc/alloy/config.alloy",
+                    "mode": "ro", # read-only, different from default read-write, so that config always comes from github repo
+                },
+            },
+            ports={"12345": 12345},
+            detach=True,
+            name=f"{self.cfg.container_prefix}-grafana-alloy",
+        )
+
+        # todo: consider adapting to make storage path another volume that persists across container removals/restarts, see https://claude.ai/chat/3468da8e-f37a-4fee-8d04-65096e150176
+
 
     def db_configure(self, container, _):
         print("[web-app-dn] Waiting for db")

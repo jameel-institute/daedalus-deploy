@@ -111,3 +111,7 @@ def main(argv=None):
         constellation.obj.__getattribute__(action)(**args)
         if action == "stop" and args["remove_volumes"]:
             remove_config(path)
+        if action == "stop":
+            # stop container 'daedalus-grafana-alloy' using bash
+            os.system("docker stop daedalus-grafana-alloy")
+            os.system("docker rm daedalus-grafana-alloy")

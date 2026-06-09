@@ -1,5 +1,6 @@
 import constellation
 from constellation import config
+import os
 
 
 class DaedalusConfig:
@@ -58,6 +59,10 @@ class DaedalusConfig:
             self.acme_buddy_port = config.config_integer(dat, [acme_key, "port"])
             self.acme_buddy_hdb_username = config.config_string(dat, [acme_key, "hdb_username"])
             self.acme_buddy_hdb_password = config.config_string(dat, [acme_key, "hdb_password"])
+
+        # alloy config
+        # todo: scope alloy configs under per-config dirs, as in packit-deploy
+        self.grafana_alloy_config_path = os.path.abspath(os.path.join(path, "grafana_alloy_config_dir/config.alloy"))
 
     def get_image_reference(self, config_section, dat):
         repo = config.config_string(dat, [config_section, "image", "repo"])
