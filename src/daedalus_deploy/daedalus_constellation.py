@@ -143,16 +143,16 @@ class DaedalusConstellation:
                 "/etc/alloy/config.alloy",
             ],
             volumes={ # = -v <CONFIG_FILE_PATH>:/etc/alloy/config.alloy
-                self.cfg.grafana_alloy_config_path: {
+                self.cfg.grafana_alloy_config_path: { # Claude says providing a host-path key automatically creates this as a BIND mount (as I wanted)
                     "bind": "/etc/alloy/config.alloy",
                     "mode": "ro", # read-only, different from default read-write, so that config always comes from github repo
                 },
-                "/var/run/docker.sock": {
+                "/var/run/docker.sock": { # Claude says providing a host-path key automatically creates this as a BIND mount (as I wanted)
                     "bind": "/var/run/docker.sock",
                     "mode": "ro",
                 },
             },
-            ports={"12345": 12345}, # NB this exposes the Alloy debugging UI outside the local network (1) https://grafana.com/docs/alloy/latest/configure/linux/#expose-the-ui-to-other-machines (2) https://grafana.com/docs/alloy/latest/troubleshoot/debug/#alloy-ui
+            ports={"12345": 12345}, # NB this exposes the Alloy UI outside the local network (1) https://grafana.com/docs/alloy/latest/configure/linux/#expose-the-ui-to-other-machines (2) https://grafana.com/docs/alloy/latest/troubleshoot/debug/#alloy-ui
             # I wonder if, if I find out the IP of daedalus-dev, I can request like [ip address]:12345 and find the UI
             # TODO: If I comment out the above line, then in local dev I don't get any Alloy UI at all. Check if this UI is exposed on prod-like instances and configure it not to be if it is. Hopefully nginx will just not expose it.
             detach=True,
@@ -160,7 +160,8 @@ class DaedalusConstellation:
             environment={
                 "INSTANCE_HOSTNAME": self.cfg.proxy_host, # To tell config.alloy what instance we are reporting from
                 "CONTAINER_PREFIX": self.cfg.container_prefix # To help Alloy exclude irrelevant containers when running daedalus-deploy locally (may be alongside montagu-monitor for example, which we don't want to report)
-            },
+            }, 
+            # Conditionally (based on config) set an env var for (a) the docker bridge IP for local dev or (b) bots.dide.ic.ac.uk
         )
 
         # todo: consider adapting to make storage path another volume that persists across container removals/restarts, see https://claude.ai/chat/3468da8e-f37a-4fee-8d04-65096e150176

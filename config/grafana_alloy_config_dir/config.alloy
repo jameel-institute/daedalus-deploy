@@ -87,7 +87,17 @@ loki.process "getting_started" { // Can be renamed 'process_logs' per https://gr
 // This component writes the logs to Loki. It forwards the logs to the Loki endpoint http://loki:3100/loki/api/v1/push.
 loki.write "getting_started" {
 	endpoint {
-		url  = "http://loki:3100/loki/api/v1/push"
+    // replaced localhost with 172.17.0.1 experimentally in case these messages are trapped inside docker container
+    // https://claude.ai/chat/6c2c1952-7b36-4f58-bf71-5f329ded9b49
+		url  = "http://172.17.0.1:3100/loki/api/v1/push"
+    // Is it sending this inside the container somehow?
+
+    // OK nice that fixed it, so next I would like to get the bridge IP a different way
+
+    // BUT we still need to know how to send requests between actual host machines! Can I replace '172.17.0.1' with
+    // 'bots.dide.ic.ac.uk'?
+
+    // Later probably stop using docker for Alloy.
 	}
 
   // Example auth. See https://grafana.com/docs/alloy/latest/reference/components/loki/loki.write/ for options
@@ -96,6 +106,23 @@ loki.write "getting_started" {
   //  password = "admin" // password = sys.env("GRAFANA_CLOUD_API_KEY")
   // }
 }
+
+// cf also:
+// local.file "api_key" {
+//   filename = "/etc/secrets/api.key"
+//   is_secret = true // Prevents value from appearing in UI (does that mean alloy UI or grafana UI?)
+// }
+
+// prometheus.remote_write "production" {
+//     endpoint {
+//         url = "http://localhost:9090/api/v1/write"
+
+//         basic_auth {
+//             username = "admin"
+//             password = local.file.api_key.content
+//         }
+//     }
+// }
 
 // Grafana Alloy provides a built-in real time log viewer.
 // This allows you to view current log entries and how they are being transformed via specific components of the pipeline.
