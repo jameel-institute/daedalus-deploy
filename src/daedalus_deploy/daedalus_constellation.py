@@ -62,7 +62,12 @@ class DaedalusConstellation:
         web_app = constellation.ConstellationContainer("web-app", cfg.web_app_ref, environment=web_app_env)
 
         # 6. proxy
-        proxy_ports = [cfg.proxy_port_http, cfg.proxy_port_https]
+        if cfg.map_proxy_ports:
+            # Map 801:80 and 4431:443 for local development when running two systems that both want to use ports 80 and 443.
+            # Then navigate to https://localhost:4431/scenarios/new
+            proxy_ports = [(cfg.proxy_port_http, f"{cfg.proxy_port_http}1"), (cfg.proxy_port_https, f"{cfg.proxy_port_https}1")]
+        else:
+            proxy_ports = [cfg.proxy_port_http, cfg.proxy_port_https]
         proxy_mounts = [
             constellation.ConstellationVolumeMount("proxy-logs", cfg.proxy_logs_location),
             constellation.ConstellationVolumeMount("daedalus-tls", "/run/proxy"),

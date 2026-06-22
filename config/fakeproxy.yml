@@ -1,5 +1,6 @@
 proxy:
   host: localhost
+  map_ports: true
 web_app_db:
   postgres:
     password: changeme

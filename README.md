@@ -50,6 +50,10 @@ Run tests with `hatch test`. Generate coverage with `hatch test --cover`.
 ### Linting
 Run linting with automatic fixes with `hatch fmt`. To check linting only, with no file changes, use `hatch fmt --check`.
 
+### Log streaming with Grafana Alloy
+
+We use Grafana Alloy as the agent to stream logs from the host machine to montagu-monitor. If you are testing the integration of montagu-monitor and daedalus-deploy locally, these will compete for the use of ports 80 and 443. To skirt around this, you can set `proxy.map_ports` to true in the `fakeproxy.yml` config to tell daedalus-deploy's proxy container to map those ports to 801 and 4431 instead.
+
 ## Using Let's Encrypt
 
 We mount a shared volume (`daedalus-tls`) into the proxy, and a long-running
