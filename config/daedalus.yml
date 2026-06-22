@@ -9,6 +9,7 @@ proxy:
   port_http: 80
   port_https: 443
   logs_location: /var/log/nginx
+  map_ports: false
 redis:
   image:
     repo: library
