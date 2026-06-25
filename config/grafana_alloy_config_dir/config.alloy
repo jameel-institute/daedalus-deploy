@@ -42,8 +42,7 @@ discovery.relabel "getting_started" { // Example name: "logs_integrations_docker
   // constants.hostname ought to work, but since we're running Alloy in a container, it just gives the container ID. So we could pass in something like 'instance_name' as an environment variable when the docker container is started up.
   rule {
     target_label = "instance_hostname"
-    // replacement  = constants.hostname
-    replacement = sys.env("INSTANCE_HOSTNAME") // I set this in daedalus_constellation.py
+    replacement  = constants.hostname
   }
 }
 
@@ -64,14 +63,6 @@ loki.source.docker "getting_started" { // Example name: "default" per https://gi
 // This component provides stages for log transformation and extraction. In this case it adds a static label env=production to all logs.
 loki.process "getting_started" { // Can be renamed 'process_logs' per https://grafana.com/docs/grafana-cloud/send-data/alloy/tutorials/processing-logs/#configure-the-lokiprocess-and-lokiwrite-components
 // or 'docker_logs' per https://github.com/grafana/alloy-scenarios/blob/main/docker-monitoring/config.alloy
-  // Drop logs from containers whose name doesn't start with the prefix e.g. keep 'daedalus-redis' but drop 'other'
-  stage.match {
-    selector = string.format(
-      `{container_name!~"%s.*"}`, // "!~" means "does not match regex"
-      string.replace(sys.env("CONTAINER_PREFIX"), ".", `\.`), // Escape any potential periods in container prefix for regex parsing
-    )
-    action = "drop"
-  }
 
   // TODO: try out: https://grafana.com/docs/alloy/latest/reference/components/loki/loki.process/#stagedocker
 
@@ -89,7 +80,7 @@ loki.write "getting_started" {
 	endpoint {
     // replaced localhost with 172.17.0.1 experimentally in case these messages are trapped inside docker container
     // https://claude.ai/chat/6c2c1952-7b36-4f58-bf71-5f329ded9b49
-		url  = "http://172.17.0.1:3100/loki/api/v1/push"
+		url  = "https://192.168.122.1/loki/api/v1/push"
     // Is it sending this inside the container somehow?
 
     // OK nice that fixed it, so next I would like to get the bridge IP a different way
@@ -98,13 +89,18 @@ loki.write "getting_started" {
     // 'bots.dide.ic.ac.uk'?
 
     // Later probably stop using docker for Alloy.
-	}
 
-  // Example auth. See https://grafana.com/docs/alloy/latest/reference/components/loki/loki.write/ for options
-  // basic_auth {
-  //  username = "admin" // username = sys.env("LOKI_USERNAME")
-  //  password = "admin" // password = sys.env("GRAFANA_CLOUD_API_KEY")
-  // }
+    // Example auth. See https://grafana.com/docs/alloy/latest/reference/components/loki/loki.write/ for options
+    basic_auth {
+      username = "loki" // username = sys.env("LOKI_USERNAME")
+      password = "lokalhost" // password = sys.env("GRAFANA_CLOUD_API_KEY")
+    }
+
+    // FOR LOCAL / DEV ONLY! to ignore self-signed cert issue.
+    tls_config {
+      insecure_skip_verify = true
+    }
+	}
 }
 
 // cf also:
